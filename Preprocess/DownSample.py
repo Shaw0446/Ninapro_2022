@@ -5,7 +5,7 @@ from scipy.signal import resample
 from wfdb import processing
 import pandas as pd
 import nina_funcs as nf
-
+dir='F:/ninapro'
 
 def downsample(data, oldFS, newFS):
     """
@@ -33,7 +33,7 @@ def downsample(data, oldFS, newFS):
 
 if __name__ == '__main__':
     for j in range(1,2):
-        df = pd.read_hdf('D:/Pengxiangdong/ZX/DB2/data/raw/DB2_s' + str(j) + 'raw.h5', 'df')
+        df = pd.read_hdf(dir+'/data/raw/DB2_s' + str(j) + 'raw.h5', 'df')
         data = np.array(df)
         channel = 12
         index = []
@@ -62,5 +62,5 @@ if __name__ == '__main__':
         df_down['repetition'] = rep
 
     # 存储为h5文件
-        df_down.to_hdf('D:/Pengxiangdong/ZX/DB2/data/df_down/DB2_s' + str(j) + 'down.h5', format='table', key='df', mode='w', complevel=9, complib='blosc')
+        df_down.to_hdf(dir+'/data/df_down/DB2_s' + str(j) + 'down.h5', format='table', key='df', mode='w', complevel=9, complib='blosc')
         print()

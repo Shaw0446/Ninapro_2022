@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 from mpl_toolkits.axisartist import SubplotZero
 from tqdm import tqdm
-
+dir='F:/ninapro'
 
 def rect_sum(amplitude, v):
     '''绘制矩形'''
@@ -123,7 +123,7 @@ def energy_map(iemg, freq=2000):
 
 
 for j in range(1, 2):
-    file = h5py.File('D:/Pengxiangdong/ZX/DB2/data/df_Seg/DB2_s' + str(j) + 'Seg17.h5', 'r')
+    file = h5py.File(dir+'/data/df_Seg/DB2_s' + str(j) + 'Seg17.h5', 'r')
     x_train1, x_train3, x_train4, x_train6 = file['x_train1'][:],file['x_train3'][:],file['x_train4'][:],file['x_train6'][:]
     y_train1,y_train3,y_train4,y_train6 = file['y_train1'][:],file['y_train3'][:],file['y_train4'][:],file['y_train6'][:]
     x_test = file['x_test'][:]
@@ -138,7 +138,7 @@ for j in range(1, 2):
     maptest = channel_join(x_test,12)
 
     # 存储为h5文件
-    file = h5py.File('D:/Pengxiangdong/ZX/DB2/data/energy_map/DB2_s' + str(j) + 'map17.h5', 'w')
+    file = h5py.File(dir+'/data/energy_map/DB2_s' + str(j) + 'map17.h5', 'w')
     file.create_dataset('map1', data=map1.astype('float32'))
     file.create_dataset('map3', data=map3.astype('float32'))
     file.create_dataset('map4', data=map4.astype('float32'))

@@ -11,7 +11,7 @@ from tqdm import tqdm
 train_reps = [1, 3, 4, 6]
 test_reps = [2, 5]
 gestures = list(range(1, 50))
-
+dir='F:/ninapro'
 '''
     本类将上一个实验的预处理部分用dataframe格式重写,便于后续实验在
     数据处理上共用,也是更符合github工具包的存储格式
@@ -69,14 +69,14 @@ def action_comb(actionList, timeWindow, strideWindow, channel=12):
 
 
 for j in range(1, 2):
-    df = pd.read_hdf('D:/Pengxiangdong/ZX/DB2/data/raw/DB2_s' + str(j) + 'raw.h5', 'df')
+    df = pd.read_hdf(dir+'/data/raw/DB2_s' + str(j) + 'raw.h5', 'df')
 
     '''滑动窗口分割'''
     actionList = action_seg(df, 12, 49)
     # unList = uniform(actionList, 12)
     emgList, labelList = action_comb(actionList, 400, 100)
     # # 存储为h5文件
-    file = h5py.File('D:/Pengxiangdong/ZX/DB2/data/df_Seg/DB2_s' + str(j) + 'Seg.h5', 'w')
+    file = h5py.File(dir+'/data/df_Seg/DB2_s' + str(j) + 'Seg.h5', 'w')
     file.create_dataset('Data1', data=(emgList[1]).astype('float32'))
     file.create_dataset('Data2', data=(emgList[2]).astype('float32'))
     file.create_dataset('Data3', data=(emgList[3]).astype('float32'))
