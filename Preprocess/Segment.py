@@ -6,8 +6,8 @@ import nina_funcs as nf
 
 train_reps = [1, 3, 4, 6]
 test_reps = [2, 5]
-gestures = list(range(1, 50))
-dir='F:/ninapro'
+gestures = list(range(1, 18))
+dir='F:/DB2'
 
 
 
@@ -19,7 +19,7 @@ for j in range(1, 2):
     x_test, y_test, r_test = nf.windowing(df, reps=test_reps, gestures=gestures, win_len=400, win_stride=100)
 
     # 存储为h5文件
-    file = h5py.File(dir+'/data/Seg/DB2_s' + str(j) + 'Seg.h5', 'w')
+    file = h5py.File(dir+'/data/Comb_Seg/DB2_s' + str(j) + 'Seg17.h5', 'w')
     file.create_dataset('x_train', data=x_train.astype('float32'))
     file.create_dataset('x_test', data=x_test.astype('float32'))
     file.create_dataset('y_train', data=y_train.astype('int32'))

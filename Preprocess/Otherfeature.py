@@ -19,7 +19,6 @@
 #
 
 
-
 #
 # def emg_sampen(signal):
 #     sampen = sampen2(signal)

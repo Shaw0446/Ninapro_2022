@@ -4,7 +4,7 @@ import numpy as np
 import nina_funcs as nf
 import matplotlib.pyplot as plt
 import os
-from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
 
 from Models.PopularModel.Energy import EnergyCNN
 from Util.SepData import Sep3Data

@@ -4,16 +4,14 @@ import pandas as pd
 import numpy as np
 from mpl_toolkits.axisartist import SubplotZero
 from tqdm import tqdm
-dir='F:/ninapro'
+dir='F:/DB2'
 
 def rect_sum(amplitude, v):
     '''绘制矩形'''
     xmax = np.max(amplitude)
     xmin = np.min(amplitude)
-    xavg = np.average(amplitude)
     ymax = np.max(v)
     ymin = np.min(v)
-    yavg = np.average(v)
 
     N1 = 20
     N2 = 20
@@ -39,10 +37,10 @@ def rect_sum(amplitude, v):
 
 
     '''I表示为加入权重的灰度矩阵，w * l为不同相图的单元格面积'''
-    I = GSMatrix_Mov * (int(w * l))
-    B = I.astype(np.int)
+    I = GSMatrix_Mov * (w * l)
+    # B = I.astype(np.int)
 
-    return B
+    return I
 
 
 def channel_join(emg_arr, channel=12):
@@ -123,7 +121,7 @@ def energy_map(iemg, freq=2000):
 
 
 for j in range(1, 2):
-    file = h5py.File(dir+'/data/df_Seg/DB2_s' + str(j) + 'Seg17.h5', 'r')
+    file = h5py.File(dir+'/data/Comb_SegNor/DB2_s' + str(j) + 'Seg17.h5', 'r')
     x_train1, x_train3, x_train4, x_train6 = file['x_train1'][:],file['x_train3'][:],file['x_train4'][:],file['x_train6'][:]
     y_train1,y_train3,y_train4,y_train6 = file['y_train1'][:],file['y_train3'][:],file['y_train4'][:],file['y_train6'][:]
     x_test = file['x_test'][:]

@@ -1,18 +1,16 @@
-import h5py
+import pandas as pd
 import numpy as np
-
-# v = 0.0000000000000009876543212133
-# a=float('%.6g' %v)
-# print("v=",v)
-# print("a=",a)
-#
-# b=a
-# print(float(b))
-
-
+from sklearn.model_selection import train_test_split, StratifiedKFold
+from sklearn.preprocessing import StandardScaler
 from scipy import signal
-import matplotlib.pyplot as plt
-import numpy as np
-# 产生一个测试信号，振幅为2的正弦波，其频率在3kHZ缓慢调制，振幅以指数形式下降的白噪声
-for j in range(1,7):
-    print(j)
+from scipy.io import loadmat
+from sklearn.metrics import confusion_matrix
+import os
+import pywt
+from tensorflow.keras.models import Sequential, Model, load_model
+import datetime
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
+from tensorflow import keras as K
+from tqdm import tqdm
+from sklearn.decomposition import PCA
+import scipy as sp

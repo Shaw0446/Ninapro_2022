@@ -31,21 +31,11 @@ def pltCurve(loss, val_loss, accuracy, val_accuracy):
 if __name__ == '__main__':
 
     for j in range(1,2):
-        sigFile = h5py.File(dir+'/data/down_Seg/DB2_s' + str(j) + 'Seg.h5', 'r')
-        feaFile = h5py.File(dir+'/data/featureMap/DB2_s' + str(j) + 'map.h5', 'r')
+        feaFile = h5py.File(dir+'/data/down_Fea/DB2_s' + str(j) + 'map.h5', 'r')
         #将六次重复手势分开存储
-
-        x_train = sigFile['x_train'][:]
-        x_test = sigFile['x_test'][:]
-
-        X_train_highimg, X_train_lowimg = feaFile['X_train_highimg'][:], feaFile['X_train_lowimg'][:]
-        X_test_highimg, X_test_lowimg = feaFile['X_test_highimg'][:], feaFile['X_test_lowimg'][:]
-        y_train, y_test = sigFile['y_train'][:], sigFile['y_test'][:]
-        sigFile.close(), feaFile.close()
-        #
-        # Xtrain1, Xtrain2, Xtrain3 = Sep3Fea(X_train_highimg)
-        # Xtest1, Xtest2, Xtest3 = Sep3Fea(X_test_highimg)
-
+        x_train, x_test = feaFile['x_train'][:], feaFile['x_train'][:]
+        y_train, y_test = feaFile['y_train'][:], feaFile['y_test'][:]
+        feaFile.close()
         Y_train = nf.get_categorical(y_train)
         Y_test = nf.get_categorical(y_test)
 
@@ -56,8 +46,8 @@ if __name__ == '__main__':
             ModelCheckpoint(filepath=dir+'/DB2_model/DB2_s' + str(j) + 'Fea.h5'
             , monitor='val_accuracy', save_best_only=True)]
         model = Stage1()
-        history = model.fit([x_train ,X_train_highimg, X_train_lowimg], Y_train, epochs=50, verbose=2, batch_size=64
-                            , validation_data=([x_test, X_test_highimg, X_test_lowimg], Y_test), callbacks=callbacks)
+        history = model.fit(x_train, Y_train, epochs=50, verbose=2, batch_size=64
+                            , validation_data=(x_test, Y_test), callbacks=callbacks)
 
         # loss= history.history['loss']
         # val_loss = history.history['val_loss']

@@ -8,6 +8,7 @@ import nina_funcs as nf
 train_reps = [1, 3, 4, 6]
 test_reps = [2, 5]
 gestures = list(range(1, 18))
+dir='F:/DB2'
 
 '''对nina_funcs继续扩展的从训练集中划分验证集'''
 def dataCombin(data, label, rep_arr, reps):
@@ -23,17 +24,16 @@ def dataCombin(data, label, rep_arr, reps):
 
 
 for j in range(1, 2):
-    df = pd.read_hdf('D:/Pengxiangdong/ZX/DB2/data/raw/DB2_s' + str(j) + 'raw.h5', 'df')
+    df = pd.read_hdf(dir+'/data/down/DB2_s' + str(j) + 'down.h5', 'df')
 
-    '''滑动窗口分割'''
+    '''标准化'''
     # df1 = nf.normalise(df.copy(deep=True), train_reps)
-    #
     # df2 = df1.copy(deep=True)
     # df2.iloc[:, :12] = df2.iloc[:, :12]
     # df3 = df2.astype(np.float32)
-    # 滑动窗口分割
-    x_train, y_train, r_train = nf.windowing(df, reps=train_reps, gestures=gestures, win_len=400, win_stride=100)
-    x_test, y_test, r_test = nf.windowing(df, reps=test_reps, gestures=gestures, win_len=400, win_stride=100)
+    ''' 滑动窗口分割'''
+    x_train, y_train, r_train = nf.windowing(df, reps=train_reps, gestures=gestures, win_len=20, win_stride=1)
+    x_test, y_test, r_test = nf.windowing(df, reps=test_reps, gestures=gestures, win_len=20, win_stride=1)
 
 
 
@@ -46,7 +46,7 @@ for j in range(1, 2):
 
 
     # 存储为h5文件
-    file = h5py.File('D:/Pengxiangdong/ZX/DB2/data/df_Seg/DB2_s' + str(j) + 'Seg17.h5', 'w')
+    file = h5py.File(dir+'/data/Comb_downSeg/DB2_s' + str(j) + 'Seg17.h5', 'w')
     file.create_dataset('x_train1', data=x_train1.astype('float32'))
     file.create_dataset('x_train3', data=x_train3.astype('float32'))
     file.create_dataset('x_train4', data=x_train4.astype('float32'))
