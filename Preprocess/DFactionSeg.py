@@ -2,9 +2,11 @@ import math
 import h5py
 import pandas as pd
 import numpy as np
+import tsaug
 from sklearn import preprocessing
 import scipy.signal as signal
 import nina_funcs as nf
+from sklearn.preprocessing import StandardScaler
 from tqdm import tqdm
 
 
@@ -44,6 +46,74 @@ def uniform(actionList, channel):
         action.iloc[:, :channel] = BNemg
 
     return actionList
+
+
+'''
+    该函数在输入二维数组时会将各个通道随机打乱，破坏了不同电极采样的同步性，故设定随机种子，单个通道依次打乱
+        输入的数据是一维列向量，新生成的数据是一维行向量
+'''
+def OneEnhanceEMG(data):
+    newdata =tsaug.TimeWarp(n_speed_change=1, max_speed_ratio=1.5, seed=123).augment(data)
+#     enhancedata =np.hstack((data, newdata))
+    return data, newdata
+
+
+
+'''
+    将数据增强写在标准化里面是为了将增强的数据和原始数据分开标准化，拼接的标准化方法会影响原始数据。
+    不分割为肌电子图返回数据标准化后结果,BNdatalist元素为单独一个动作手势标准化后的结果，
+    保存有对应的标签 ,返回类型(time,channel),考虑到实验流程，把数据增强放在标准化前
+'''
+def bnEnhancesegment(seglist, channel=12):
+    channel = 12
+    BNdatalist = []
+    for i in range(len(seglist)):
+        temp_label = seglist[i].iloc[0, channel]
+        temp_rep = seglist[i].iloc[0, channel+1]
+        #跳过标签为0
+        if(temp_label==0):
+           continue
+        if temp_rep in([1, 3, 4, 6]):
+            # 增强前后的手势分开标准化，对训练集第1，3，4，6次进行增强
+            timedata = np.array(seglist[i].iloc[:, :channel].copy())
+            data = []
+            newdata = []
+            for Numchannel in range(12):
+                datasample, newdatasample = OneEnhanceEMG(timedata[:, Numchannel])
+                data.append(datasample)
+                newdata.append(newdatasample)
+            data = (np.array(data)).T       #将数据转换为（time,channel）
+            newdata = (np.array(newdata)).T
+            # flag来控制对未增强数据的保存
+            flag = True
+            for iemg in ([data, newdata]):
+                scaler = StandardScaler()
+                Zscdata = scaler.fit_transform(iemg[:])
+                BNdata = Zscdata
+                if (flag):
+                    bndata1 =BNdata
+                    flag=False
+                else:
+                    bndata2 =BNdata
+            #数据倍增后，标签倍增
+            BNdata = np.vstack((bndata1, bndata2))
+            BNlabel = np.hstack([seglist[i].iloc[:, channel], seglist[i].iloc[:, channel]])
+            BNrep = np.hstack([seglist[i].iloc[:, channel+1], seglist[i].iloc[:, channel+1]])
+        #测试集不做数据增强
+        else:
+            iemg = np.array(seglist[i].iloc[:, :channel].copy())
+            scaler = StandardScaler()
+            Zscdata = scaler.fit_transform(iemg[:])
+            BNdata = Zscdata
+            BNlabel= seglist[i].iloc[:, channel]
+            BNrep = seglist[i].iloc[:, channel+1]
+        myemg=pd.DataFrame(BNdata)
+        myemg['stimulus'] = BNlabel
+        myemg['repetition'] = BNrep
+        BNdatalist.append(myemg)
+    return BNdatalist
+
+
 
 
 

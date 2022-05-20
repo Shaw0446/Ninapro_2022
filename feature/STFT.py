@@ -3,7 +3,8 @@ import scipy
 import scipy.signal as signal
 import matplotlib.pyplot as plt
 import numpy as np
-
+import pandas as pd
+dir='F:/DB2'
 
 
 def stft(sig, **params):
@@ -44,17 +45,17 @@ def stft_specgram(sig, picname=None, **params):    #picname是给图像的名字
 
 if __name__ == '__main__':
     for j in range(1, 2):
-        h5 = h5py.File('F:/DB2/raw/DB2_s' + str(j) + 'raw.h5', 'r')
-        alldata = h5['alldata'][:]
-        seglist = actionSegment(alldata, 1, 12)
+        df1 = pd.read_hdf(dir+'/data/raw/DB2_s' + str(j) + 'raw.h5', 'df')
+        alldata = np.array(df1)
         # bnlist = bnsegment(seglist)i
         stftarr=[]
-        for k in range(6):
-            iemg = seglist[k].data
-            for m in range(12):
-                f, t, zxx=signal.spectrogram(iemg[0:400, m],fs=2000,noverlap=128)
-                stftarr.append(f)
-            print()
+        timearr=[]
+        iemg = alldata[10000:10400,:12]
+        for m in range(12):
+            f, t, zxx=stft_specgram(iemg[0:400, m],fs=2000)
+            stftarr.append(f)
+            timearr.append(t)
+        print()
 
 
 
