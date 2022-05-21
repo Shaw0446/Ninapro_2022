@@ -22,18 +22,15 @@ dir='F:/DB2'
 '''  df形式的动作分割（要求能不排除休息状态）'''
 def action_seg(data, channel, endlabel):
     actionList = []  # 存储动作
-    tag = []  # 记录标签
     begin = 0
     for aim in tqdm(range(len(data) - 1)):
         # 控制手势停止时间
-        if (data.iloc[aim, channel] ==endlabel+1):
+        if (data.iloc[aim, channel] == endlabel + 1):
             break;
-        if (data.iloc[aim, channel] != data.iloc[aim + 1, 12]):
-            tag.append(aim)
+        if (aim == len(data) - 1 or data.iloc[aim, channel] != data.iloc[aim + 1, 12]):
             end = aim
             actionList.append(data[begin:end])
             begin = end + 1
-    actionList.append(data[begin:len(data)])
     return actionList
 
 '''数据标准化（list的元素为df的方式）'''
