@@ -12,6 +12,7 @@ from tfdeterminism import patch
 dir='F:/DB2'
 
 #确定随机数
+os.environ['TF_DETERMINISTIC_OPS'] = '1'
 patch()
 np.random.seed(123)
 tf.random.set_seed(123)

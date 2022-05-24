@@ -10,14 +10,16 @@ from Models.PopularModel.DownAway3CBAM import DownAway3reluBNCBAM
 from Models.PopularModel.EmgNet import EmgCNN, EmgCNN2
 from Util.SepData import Sep3Data
 from tfdeterminism import patch
-dir='F:/DB2'
 
-#确定随机数
+dir = 'F:/DB2'
+
+# 确定随机数
 patch()
 np.random.seed(123)
 tf.random.set_seed(123)
-# os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
+
+# os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
 
 def pltCurve(loss, val_loss, accuracy, val_accuracy):
@@ -32,6 +34,7 @@ def pltCurve(loss, val_loss, accuracy, val_accuracy):
     plt.legend()
     plt.show()
 
+
 def restore(array):
     N1 = 4;
     N2 = 100
@@ -39,18 +42,15 @@ def restore(array):
     for i in range(len(array)):
         temp = array[i, :, :]
         for j in range(12):
-            temp2 = temp[:,j].reshape(N1, N2)
+            temp2 = temp[:, j].reshape(N1, N2)
             X[i, :, :, j] = temp2
 
     return X
 
 
-
-
-
 if __name__ == '__main__':
     for j in range(1, 2):
-        file = h5py.File(dir+'/data/df_Seg/DB2_s' + str(j) + 'Seg.h5', 'r')
+        file = h5py.File(dir + '/data/df_Seg/DB2_s' + str(j) + 'Seg.h5', 'r')
         emg1, emg3, emg4, emg6 = file['x_train1'][:], file['x_train3'][:] \
             , file['x_train4'][:], file['x_train6'][:]
         y_train1, y_train3, y_train4, y_train6 = file['y_train1'][:], file['y_train3'][:], file['y_train4'][:] \
@@ -67,15 +67,13 @@ if __name__ == '__main__':
         Y_test = nf.get_categorical(y_test)
         file.close()
 
-        callbacks = [#1设置学习率衰减,2保存最优模型
+        callbacks = [  # 1设置学习率衰减,2保存最优模型
             # ReduceLROnPlateau(monitor='val_accuracy', factor=0.1, patience=10, verbose=0, mode='auto', min_delta=0.0001,
             #                   cooldown=0, min_lr=0),
-            ModelCheckpoint(filepath=dir+'/DB2_model'
-                                     '/DB2_s' + str(j) + 'model.h5'
-            , monitor='val_accuracy', save_best_only=True)]
+            ModelCheckpoint(filepath=dir + '/DB2_model'
+                                           '/DB2_s' + str(j) + 'model.h5'
+                            , monitor='val_accuracy', save_best_only=True)]
         model = EmgCNN2()
         history = model.fit(X_train, Y_train, epochs=100, verbose=2, batch_size=64
-            ,validation_data=(X_test,Y_test)
-            , callbacks=callbacks)
-
-
+                            , validation_data=(X_test, Y_test)
+                            , callbacks=callbacks)

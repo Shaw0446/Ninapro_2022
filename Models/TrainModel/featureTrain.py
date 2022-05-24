@@ -2,9 +2,9 @@ import tensorflow as tf
 import h5py
 import numpy as np
 import matplotlib.pyplot as plt
-from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
 import nina_funcs as nf
-from Models.PopularModel.FeaModel import FeaAway3CBAM, Stage1, Stage2
+from Models.PopularModel.FeaModel import FeaAway3CBAM, Stage1, Stage2, model1
 from Util.SepData import Sep3Data, Sep3Fea
 from tfdeterminism import patch
 dir='F:/DB2'
@@ -31,9 +31,9 @@ def pltCurve(loss, val_loss, accuracy, val_accuracy):
 if __name__ == '__main__':
 
     for j in range(1,2):
-        feaFile = h5py.File(dir+'/data/down_Fea/DB2_s' + str(j) + 'map.h5', 'r')
+        feaFile = h5py.File(dir+'/data/down_Fea/DB2_s' + str(j) + 'fea.h5', 'r')
         #将六次重复手势分开存储
-        x_train, x_test = feaFile['x_train'][:], feaFile['x_train'][:]
+        x_train, x_test = feaFile['x_train'][:], feaFile['x_test'][:]
         y_train, y_test = feaFile['y_train'][:], feaFile['y_test'][:]
         feaFile.close()
         Y_train = nf.get_categorical(y_train)
@@ -41,12 +41,12 @@ if __name__ == '__main__':
 
         callbacks = [#1设置学习率衰减,2保存最优模型
             # EarlyStopping(monitor='val_accuracy', patience=5),
-            # ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=10, verbose=0, mode='auto', min_delta=0.0001,
-            #                   cooldown=0, min_lr=0),
+            ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=5, verbose=0, mode='auto', min_delta=0.0001,
+                              cooldown=0, min_lr=0),
             ModelCheckpoint(filepath=dir+'/DB2_model/DB2_s' + str(j) + 'Fea.h5'
             , monitor='val_accuracy', save_best_only=True)]
-        model = Stage1()
-        history = model.fit(x_train, Y_train, epochs=50, verbose=2, batch_size=64
+        model = model1()
+        history = model.fit(x_train, Y_train, epochs=100, verbose=2, batch_size=32
                             , validation_data=(x_test, Y_test), callbacks=callbacks)
 
         # loss= history.history['loss']

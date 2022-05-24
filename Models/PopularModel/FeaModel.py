@@ -46,7 +46,6 @@ def cbam_module(input_xs, reduction_ratio=0.5):
     return KL.Add()([refined_feature, input_xs])
 
 
-
 def Stage1():
     input00 = KL.Input(shape=(20, 12))
     input0 = tf.expand_dims(input=input00, axis=3)
@@ -81,7 +80,6 @@ def Stage1():
                   loss='categorical_crossentropy', metrics=['accuracy'])
     return model
 
-
 def Stage2():
     input1 = KL.Input(shape=(16, 16, 12))
     input2 = KL.Input(shape=(16, 16, 12))
@@ -108,8 +106,6 @@ def Stage2():
     model.compile(optimizer=tf.keras.optimizers.Adam(lr=0.001),
                   loss='categorical_crossentropy', metrics=['accuracy'])
     return model
-
-
 
 
 def FeaAway3CBAM():
@@ -158,3 +154,19 @@ def FeaAway3CBAM():
 
 
 
+def model1():
+    input1 = KL.Input(shape=(684,1))
+
+    x1 = KL.Conv1D(filters=64, kernel_size=3, strides=1, activation='relu', padding='valid')(input1)
+    x1 = KL.MaxPool1D(pool_size=2, strides=1, padding='valid')(x1)
+    x1 = KL.Conv1D(filters=64, kernel_size=5, strides=1, activation='relu', padding='valid')(x1)
+    x1 = KL.MaxPool1D(pool_size=2, strides=1, padding='valid')(x1)
+    x1 = KL.Dropout(0.1)(x1)
+    x1 = KL.Dense(256, activation='relu')(x1)
+    X = KL.Dropout(0.2)(x1)
+    X = KL.GlobalAvgPool1D()(X)
+    s = KL.Dense(17, activation='softmax')(X)
+    model = tf.keras.Model(inputs=input1, outputs=s)
+    model.compile(optimizer=tf.keras.optimizers.Adam(lr=0.001),
+                  loss='categorical_crossentropy', metrics=['accuracy'])
+    return model

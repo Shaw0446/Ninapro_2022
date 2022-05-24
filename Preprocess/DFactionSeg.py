@@ -9,7 +9,6 @@ import nina_funcs as nf
 from sklearn.preprocessing import StandardScaler
 from tqdm import tqdm
 
-
 train_reps = [1, 3, 4, 6]
 test_reps = [2, 5]
 gestures = list(range(1, 50))
