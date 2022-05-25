@@ -50,20 +50,18 @@ def restore(array):
 
 if __name__ == '__main__':
     for j in range(1, 2):
-        file = h5py.File(dir+'/data/Comb_Seg/DB2_s' + str(j) + 'Seg.h5', 'r')
-        emg1, emg3, emg4, emg6 = file['x_train1'][:], file['x_train3'][:] \
-            , file['x_train4'][:], file['x_train6'][:]
-        y_train1, y_train3, y_train4, y_train6 = file['y_train1'][:], file['y_train3'][:], file['y_train4'][:] \
-            , file['y_train6'][:]
+        file = h5py.File(dir+'/lastdata/Seg/DB2_s' + str(j) + 'Seg17.h5', 'r')
+        emg1, emg3, emg4, emg6 = file['Data1'][:], file['Data3'][:], file['Data4'][:], file['Data6'][:]
+        label1, label3, label4,label6 = file['label1'][:], file['label3'][:], file['label4'][:], file['label6'][:]
+        emg2, emg5 = file['Data2'][:], file['Data5'][:]
+        label2,label5=file['label2'][:], file['label5'][:]
+
 
         X_train = np.concatenate([emg1, emg3, emg4, emg6], axis=0)
-        # X_train = X_train.transpose((0,2,1))
-        y_train = np.concatenate([y_train1, y_train3, y_train4, y_train6], axis=0)
+        y_train = np.concatenate([label1, label3, label4, label6], axis=0)
         Y_train = nf.get_categorical(y_train)
-
-        X_test = file['x_test'][:]
-        # X_test = X_test.transpose((0,2,1))
-        y_test = file['y_test'][:]
+        X_test = np.concatenate([emg2, emg5], axis=0)
+        y_test = np.concatenate([label2, label5], axis=0)
         Y_test = nf.get_categorical(y_test)
         file.close()
 
@@ -72,8 +70,8 @@ if __name__ == '__main__':
 
 
         callbacks = [  # 1设置学习率衰减,2保存最优模型
-            # ReduceLROnPlateau(monitor='val_accuracy', factor=0.1, patience=10, verbose=0, mode='auto', min_delta=0.0001,
-            #                   cooldown=0, min_lr=0),
+            ReduceLROnPlateau(monitor='val_accuracy', factor=0.1, patience=10, verbose=0, mode='auto', min_delta=0.0001,
+                              cooldown=0, min_lr=0),
             ModelCheckpoint(filepath=dir+'/DB2_model/DB2_s' + str(j) + 'model.h5'
                             , monitor='val_accuracy', save_best_only=True)]
         model = Away3reluBNCBAMcatNEW()

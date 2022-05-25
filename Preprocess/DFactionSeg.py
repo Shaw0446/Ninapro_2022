@@ -135,14 +135,14 @@ def action_comb(actionList, timeWindow, strideWindow, channel=12):
 
 
 for j in range(1, 2):
-    df = pd.read_hdf(dir+'/data/raw/DB2_s' + str(j) + 'raw.h5', 'df')
+    df = pd.read_hdf(dir+'/data/filter/DB2_s' + str(j) + 'filter.h5', 'df')
 
     '''滑动窗口分割'''
     actionList = action_seg(df, 12, 17)
-    # unList = uniform(actionList, 12)
-    emgList, labelList = action_comb(actionList, 400, 100)
+    unList = uniform(actionList, 12)
+    emgList, labelList = action_comb(unList, 400, 100)
     # # 存储为h5文件
-    file = h5py.File(dir+'/data/df_Seg/DB2_s' + str(j) + 'Seg17.h5', 'w')
+    file = h5py.File(dir+'/lastdata/Seg/DB2_s' + str(j) + 'Seg17.h5', 'w')
     file.create_dataset('Data1', data=(emgList[1]).astype('float32'))
     file.create_dataset('Data2', data=(emgList[2]).astype('float32'))
     file.create_dataset('Data3', data=(emgList[3]).astype('float32'))

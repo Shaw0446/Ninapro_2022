@@ -24,7 +24,7 @@ def dataCombin(data, label, rep_arr, reps):
 
 
 for j in range(1, 2):
-    df = pd.read_hdf(dir+'/data/down/DB2_s' + str(j) + 'down.h5', 'df')
+    df = pd.read_hdf(dir+'/data/down/DB2_s' + str(j) + 'down1.h5', 'df')
 
     '''标准化'''
     # df1 = nf.normalise(df.copy(deep=True), train_reps)
@@ -46,7 +46,7 @@ for j in range(1, 2):
 
 
     # 存储为h5文件
-    file = h5py.File(dir+'/data/Comb_downSeg/DB2_s' + str(j) + 'Seg17.h5', 'w')
+    file = h5py.File(dir+'/data/Comb_downSeg/DB2_s' + str(j) + 'Seg17_1.h5', 'w')
     file.create_dataset('x_train1', data=x_train1.astype('float32'))
     file.create_dataset('x_train3', data=x_train3.astype('float32'))
     file.create_dataset('x_train4', data=x_train4.astype('float32'))

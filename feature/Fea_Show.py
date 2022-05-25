@@ -64,11 +64,12 @@ for j in range(1, 2):
 
     '''step2: 选择特征组合和归一化'''
     # 选择特征组合
-    features = [nf.mean,nf.median,nf.psd]
+    features = [nf.rms,nf.iemg,nf.min,nf.max]
     # features = [nf.emg_dwpt, nf.iemg,nf.rms,nf.hist,nf.entropy,nf.kurtosis,nf.zero_cross,nf.min,nf.max,nf.mean,nf.median,nf.psd]
     temp = x_train[:, :, :1]
     train_feature = nf.feature_extractor(features=features, shape=(temp.shape[0], -1), data=temp)
     # test_feature = nf.feature_extractor(features, (x_test.shape[0], -1), x_test)
     aaa = x_train[:, :, 0]
-    fea_name=['emg_dwpt', 'iemg','rms','hist','entropy','kurtosis','zero_cross','min','max','mean','median','fft','psd']
-    plot_feature_scores(np.array(train_feature),y_train,)
+    # fea_name=['emg_dwpt', 'iemg','rms','hist','entropy','kurtosis','zero_cross','min','max','mean','median','fft','psd']
+    fea_name = [ 'rms', 'iemg', 'min','max']
+    plot_feature_scores(np.array(train_feature),y_train,names=fea_name)

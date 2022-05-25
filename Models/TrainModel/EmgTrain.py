@@ -4,10 +4,10 @@ import numpy as np
 import nina_funcs as nf
 import matplotlib.pyplot as plt
 import os
-from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
 from Models.PopularModel.Away3CBAMNEW import Away3reluBNCBAMcatNEW
 from Models.PopularModel.DownAway3CBAM import DownAway3reluBNCBAM
-from Models.PopularModel.EmgNet import EmgCNN, EmgCNN2
+from Models.PopularModel.EmgNet import EmgCNN, EmgCNN2, EmgCNN3
 from Util.SepData import Sep3Data
 from tfdeterminism import patch
 
@@ -50,7 +50,7 @@ def restore(array):
 
 if __name__ == '__main__':
     for j in range(1, 2):
-        file = h5py.File(dir + '/data/df_Seg/DB2_s' + str(j) + 'Seg.h5', 'r')
+        file = h5py.File(dir + '/data/Comb_Seg/DB2_s' + str(j) + 'Seg.h5', 'r')
         emg1, emg3, emg4, emg6 = file['x_train1'][:], file['x_train3'][:] \
             , file['x_train4'][:], file['x_train6'][:]
         y_train1, y_train3, y_train4, y_train6 = file['y_train1'][:], file['y_train3'][:], file['y_train4'][:] \
@@ -73,7 +73,7 @@ if __name__ == '__main__':
             ModelCheckpoint(filepath=dir + '/DB2_model'
                                            '/DB2_s' + str(j) + 'model.h5'
                             , monitor='val_accuracy', save_best_only=True)]
-        model = EmgCNN2()
+        model = EmgCNN3()
         history = model.fit(X_train, Y_train, epochs=100, verbose=2, batch_size=64
                             , validation_data=(X_test, Y_test)
                             , callbacks=callbacks)

@@ -122,7 +122,7 @@ def Away3reluBNCBAMcatNEW():
     X = KL.GlobalAvgPool2D()(c)
     X = KL.Dense(128, activation='relu')(X)
     X = KL.Dropout(0.1)(X)
-    s = KL.Dense(49, activation='softmax')(X)
+    s = KL.Dense(17, activation='softmax')(X)
     model = tf.keras.Model(inputs=[input1, input2, input3], outputs=s)
     model.compile(optimizer=tf.keras.optimizers.Adam(lr=0.01),
                   loss='categorical_crossentropy', metrics=['accuracy'])

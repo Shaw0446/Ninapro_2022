@@ -34,23 +34,23 @@ for j in range(1, 2):
 
     '''step2: 选择特征组合和归一化'''
     # 选择特征组合
-    features = [nf.min,nf.zero_cross]
-    # features = [nf.rms, nf.entropy,  nf.kurtosis, nf.zero_cross, nf.min, nf.max, nf.mean, nf.median]
-    temp = x_train[:, :, 0]
+    features = [nf.rms,nf.min,nf.max]
+    # features = [nf.emg_dwpt, nf.iemg,nf.rms,nf.hist,nf.entropy,nf.kurtosis,nf.zero_cross,nf.min,nf.max,nf.mean,nf.median,nf.psd]
+    temp = x_train[:, :, :]
     train_feature = nf.feature_extractor(features=features, shape=(temp.shape[0], -1), data=temp)
     test_feature = nf.feature_extractor(features, (x_test.shape[0], -1), x_test)
 
-    ss = preprocessing.Normalizer(norm="l2")
-    ss.fit(train_feature)
-    sc_train = ss.transform(train_feature)
-    sc_test = ss.transform(test_feature)
+    # ss = preprocessing.Normalizer(norm="l2")
+    # ss.fit(train_feature)
+    # sc_train = ss.transform(train_feature)
+    # sc_test = ss.transform(test_feature)
 
     # x_test_fea = sc_test .reshape(sc_test.shape[0], -1, 12)
 
     # 存储为h5文件
     file = h5py.File(dir+'/data/down_Fea/DB2_s' + str(j) + 'fea.h5', 'w')
-    file.create_dataset('x_train', data=sc_train.astype('float32'))
-    file.create_dataset('x_test', data=sc_test.astype('float32'))
+    file.create_dataset('x_train', data= train_feature.astype('float32'))
+    file.create_dataset('x_test', data=test_feature.astype('float32'))
 
     file.create_dataset('y_train', data=y_train.astype('int32'))
     file.create_dataset('y_test', data=y_test.astype('int32'))

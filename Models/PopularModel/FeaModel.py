@@ -155,7 +155,7 @@ def FeaAway3CBAM():
 
 
 def model1():
-    input1 = KL.Input(shape=(684,1))
+    input1 = KL.Input(shape=(36,1))
 
     x1 = KL.Conv1D(filters=64, kernel_size=3, strides=1, activation='relu', padding='valid')(input1)
     x1 = KL.MaxPool1D(pool_size=2, strides=1, padding='valid')(x1)
