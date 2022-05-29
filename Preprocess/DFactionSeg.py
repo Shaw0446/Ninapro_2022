@@ -11,7 +11,7 @@ from tqdm import tqdm
 
 train_reps = [1, 3, 4, 6]
 test_reps = [2, 5]
-gestures = list(range(1, 50))
+# gestures = list(range(1, 50))
 dir='F:/DB2'
 '''
     本类将上一个实验的预处理部分用dataframe格式重写,便于后续实验在
@@ -101,8 +101,8 @@ def bnEnhancesegment(seglist, channel=12):
             scaler = StandardScaler()
             Zscdata = scaler.fit_transform(iemg[:])
             BNdata = Zscdata
-            BNlabel= seglist[i].iloc[:, channel]
-            BNrep = seglist[i].iloc[:, channel+1]
+            BNlabel= np.array(seglist[i].iloc[:, channel])
+            BNrep = np.array(seglist[i].iloc[:, channel+1])
         myemg=pd.DataFrame(BNdata)
         myemg['stimulus'] = BNlabel
         myemg['repetition'] = BNrep
@@ -138,11 +138,12 @@ for j in range(1, 2):
     df = pd.read_hdf(dir+'/data/filter/DB2_s' + str(j) + 'filter.h5', 'df')
 
     '''滑动窗口分割'''
-    actionList = action_seg(df, 12, 17)
-    unList = uniform(actionList, 12)
-    emgList, labelList = action_comb(unList, 400, 100)
+    actionList = action_seg(df, 12, 49)
+    # unList = uniform(actionList, 12)
+    bnlist=bnEnhancesegment(actionList)
+    emgList, labelList = action_comb(bnlist, 400, 100)
     # # 存储为h5文件
-    file = h5py.File(dir+'/lastdata/Seg/DB2_s' + str(j) + 'Seg17.h5', 'w')
+    file = h5py.File(dir+'/lastdata/Seg/DB2_s' + str(j) + 'Seg.h5', 'w')
     file.create_dataset('Data1', data=(emgList[1]).astype('float32'))
     file.create_dataset('Data2', data=(emgList[2]).astype('float32'))
     file.create_dataset('Data3', data=(emgList[3]).astype('float32'))

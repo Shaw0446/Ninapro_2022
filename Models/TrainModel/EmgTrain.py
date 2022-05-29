@@ -5,7 +5,7 @@ import nina_funcs as nf
 import matplotlib.pyplot as plt
 import os
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
-from Models.PopularModel.Away3CBAMNEW import Away3reluBNCBAMcatNEW
+from Models.PopularModel.Away3CBAM import reluBNCBAMcat
 from Models.PopularModel.DownAway3CBAM import DownAway3reluBNCBAM
 from Models.PopularModel.EmgNet import EmgCNN, EmgCNN2, EmgCNN3
 from Util.SepData import Sep3Data
@@ -50,7 +50,7 @@ def restore(array):
 
 if __name__ == '__main__':
     for j in range(1, 2):
-        file = h5py.File(dir + '/data/Comb_Seg/DB2_s' + str(j) + 'Seg.h5', 'r')
+        file = h5py.File(dir + '/data/Comb_Seg/DB2_s' + str(j) + 'Seg17_zsc.h5', 'r')
         emg1, emg3, emg4, emg6 = file['x_train1'][:], file['x_train3'][:] \
             , file['x_train4'][:], file['x_train6'][:]
         y_train1, y_train3, y_train4, y_train6 = file['y_train1'][:], file['y_train3'][:], file['y_train4'][:] \
@@ -68,8 +68,8 @@ if __name__ == '__main__':
         file.close()
 
         callbacks = [  # 1设置学习率衰减,2保存最优模型
-            # ReduceLROnPlateau(monitor='val_accuracy', factor=0.1, patience=10, verbose=0, mode='auto', min_delta=0.0001,
-            #                   cooldown=0, min_lr=0),
+            ReduceLROnPlateau(monitor='val_accuracy', factor=0.1, patience=10, verbose=0, mode='auto', min_delta=0.0001,
+                              cooldown=0, min_lr=0),
             ModelCheckpoint(filepath=dir + '/DB2_model'
                                            '/DB2_s' + str(j) + 'model.h5'
                             , monitor='val_accuracy', save_best_only=True)]

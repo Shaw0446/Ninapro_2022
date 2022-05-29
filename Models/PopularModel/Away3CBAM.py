@@ -1,4 +1,5 @@
 import tensorflow as tf
+from tensorflow.keras import regularizers
 from tensorflow.keras import backend as K
 from tensorflow.keras import layers as KL
 
@@ -81,7 +82,7 @@ def cbam_time(input_xs, reduction_ratio=0.5):
 
 
 # 3条支路，每个支路做串行的卷积注意力,在网络层加入标准化，注意顺序,早期网络加入1×1卷积
-def Away3reluBNCBAMcatNEW():
+def Away3reluBNCBAMcat():
     input1 = KL.Input(shape=(400, 8))
     input11 = tf.expand_dims(input=input1, axis=3)
     input2 = KL.Input(shape=(400, 2))
@@ -90,7 +91,7 @@ def Away3reluBNCBAMcatNEW():
     input31 = tf.expand_dims(input=input3, axis=3)
     #早期融合网络，加入1×1卷积
     c1 = KL.Concatenate(axis=-2)([input11, input21, input31])
-    c1 = KL.Conv2D(filters=32, kernel_size=(1, 1), strides=(1, 1), activation='relu', padding='same')(c1)
+    c1 = KL.Conv2D(filters=32, kernel_size=(1, 1), strides=(1, 1),kernel_regularizer=regularizers.l2(0.01), activation='relu', padding='same')(c1)
 
 
     x1 = KL.Conv2D(filters=64, kernel_size=(8, 1), strides=(1, 1), activation='relu', padding='same')(input11)
@@ -121,9 +122,32 @@ def Away3reluBNCBAMcatNEW():
     c = KL.Concatenate(axis=-1)([c1, c2])
     X = KL.GlobalAvgPool2D()(c)
     X = KL.Dense(128, activation='relu')(X)
-    X = KL.Dropout(0.1)(X)
+    X = KL.Dropout(0.2)(X)
     s = KL.Dense(17, activation='softmax')(X)
     model = tf.keras.Model(inputs=[input1, input2, input3], outputs=s)
+    model.compile(optimizer=tf.keras.optimizers.Adam(lr=0.01),
+                  loss='categorical_crossentropy', metrics=['accuracy'])
+    return model
+
+
+
+
+def reluBNCBAMcat():
+    input1 = KL.Input(shape=(400, 12))
+    input11 = tf.expand_dims(input=input1, axis=3)
+
+    x1 = KL.Conv2D(filters=64, kernel_size=(3, 1), strides=(1, 1), activation='relu', padding='same')(input11)
+    x1 = KL.BatchNormalization()(x1)
+    x1 = cbam_time(x1)
+    x1 = KL.Conv2D(filters=128, kernel_size=(1, 2), strides=(1, 1), activation='relu', padding='same')(x1)
+    x1 = KL.BatchNormalization()(x1)
+    output1 = cbam_acquisition(x1)
+
+    X = KL.GlobalAvgPool2D()(output1)
+    X = KL.Dense(128, activation='relu')(X)
+    X = KL.Dropout(0.2)(X)
+    s = KL.Dense(17, activation='softmax')(X)
+    model = tf.keras.Model(inputs=input1, outputs=s)
     model.compile(optimizer=tf.keras.optimizers.Adam(lr=0.01),
                   loss='categorical_crossentropy', metrics=['accuracy'])
     return model

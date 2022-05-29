@@ -5,7 +5,7 @@ import nina_funcs as nf
 import matplotlib.pyplot as plt
 import os
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
-from Models.PopularModel.Away3CBAMNEW import Away3reluBNCBAMcatNEW
+from Models.PopularModel.Away3CBAM import Away3reluBNCBAMcatNEW
 from Models.PopularModel.DownAway3CBAM import DownAway3reluBNCBAM
 from Util.SepData import Sep3Data
 from tfdeterminism import patch

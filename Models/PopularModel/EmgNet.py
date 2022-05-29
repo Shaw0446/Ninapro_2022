@@ -1,7 +1,11 @@
 import numpy
 import tensorflow as tf
+from tensorflow.keras import regularizers
 from tensorflow.keras import backend as K
 from tensorflow.keras import layers as KL
+
+from Models.PopularModel.Away3CBAM import cbam_time
+from Models.PopularModel.Away3CBAM  import cbam_acquisition
 
 channel_axis = 1 if K.image_data_format() == "channels_first" else 3
 
@@ -21,7 +25,7 @@ def EmgCNN():
     c = KL.GlobalAvgPool2D()(x1)
     X = KL.Dense(128, activation='relu')(c)
     X = KL.Dropout(0.1)(X)
-    s = KL.Dense(49, activation='softmax')(X)
+    s = KL.Dense(17, activation='softmax')(X)
     model = tf.keras.Model(inputs=input1, outputs=s)
     model.compile(optimizer=tf.keras.optimizers.Adam(lr=0.001),
                   loss='categorical_crossentropy', metrics=['accuracy'])
@@ -51,15 +55,17 @@ def EmgCNN3():
     input1 = KL.Input(shape=(400, 12))
     re = KL.Reshape(target_shape=(20, 20, 12))(input1)
     #早期融合网络，加入1×1卷积
-    x1 = KL.Conv2D(filters=128, kernel_size=(2, 2), strides=(1, 1), activation='relu', padding='valid')(re)
-    # x1 = KL.BatchNormalization()(x1)
-    x1 = KL.Conv2D(filters=128, kernel_size=(5, 5), strides=(1, 1), activation='relu', padding='valid')(x1)
-    # x1 = KL.BatchNormalization()(x1)
+    x1 = KL.Conv2D(filters=64, kernel_size=(3, 3), strides=(1, 1), activation='relu', padding='same')(re)
+    x1 = KL.BatchNormalization()(x1)
+    x1 = cbam_time(x1)
+    x1 = KL.Conv2D(filters=128, kernel_size=(5, 5), strides=(1, 1), activation='relu', padding='same')(x1)
+    x1 = KL.BatchNormalization()(x1)
+    output1 = cbam_acquisition(x1)
 
-    c = KL.GlobalAvgPool2D()(x1)
+    c = KL.GlobalAvgPool2D()(output1)
     X = KL.Dense(128, activation='relu')(c)
     X = KL.Dropout(0.1)(X)
-    s = KL.Dense(49, activation='softmax')(X)
+    s = KL.Dense(17, activation='softmax')(X)
     model = tf.keras.Model(inputs=input1, outputs=s)
     model.compile(optimizer=tf.keras.optimizers.Adam(lr=0.001),
                   loss='categorical_crossentropy', metrics=['accuracy'])

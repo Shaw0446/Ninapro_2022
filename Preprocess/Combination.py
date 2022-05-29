@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import scipy.signal as signal
 import nina_funcs as nf
-
+from sklearn import preprocessing
 
 train_reps = [1, 3, 4, 6]
 test_reps = [2, 5]
@@ -21,19 +21,35 @@ def dataCombin(data, label, rep_arr, reps):
     return train_data, train_label
 
 
+def DB_normalise(data, train_reps, channel=12):
+    x = [np.where(data.values[:, channel + 1] == rep) for rep in train_reps]
+    indices = np.squeeze(np.concatenate(x, axis=-1))
+    train_data = data.iloc[indices, :]
+    train_data = data.reset_index(drop=True)
+    scaler = preprocessing.StandardScaler(with_mean=True,
+                            with_std=True,
+                            copy=False).fit(train_data.iloc[:, :channel])
+
+    scaled = scaler.transform(data.iloc[:, :channel])
+    normalised = pd.DataFrame(scaled)
+    normalised['stimulus'] = data['stimulus'].values
+    normalised['repetition'] = data['repetition'].values
+
+    return normalised
 
 
 for j in range(1, 2):
-    df = pd.read_hdf(dir+'/data/down/DB2_s' + str(j) + 'down1.h5', 'df')
+    df = pd.read_hdf(dir+'/data/filter/DB2_s' + str(j) + 'filter.h5', 'df')
 
     '''标准化'''
-    # df1 = nf.normalise(df.copy(deep=True), train_reps)
-    # df2 = df1.copy(deep=True)
-    # df2.iloc[:, :12] = df2.iloc[:, :12]
-    # df3 = df2.astype(np.float32)
+    scaler = preprocessing.StandardScaler()
+    df1 = DB_normalise(df.copy(deep=True), train_reps)
+    df2 = df1.copy(deep=True)
+    df2.iloc[:, :12] = df2.iloc[:, :12]
+    df2 = df2.astype(np.float32)
     ''' 滑动窗口分割'''
-    x_train, y_train, r_train = nf.windowing(df, reps=train_reps, gestures=gestures, win_len=20, win_stride=1)
-    x_test, y_test, r_test = nf.windowing(df, reps=test_reps, gestures=gestures, win_len=20, win_stride=1)
+    x_train, y_train, r_train = nf.windowing(df, reps=train_reps, gestures=gestures, win_len=400, win_stride=100)
+    x_test, y_test, r_test = nf.windowing(df, reps=test_reps, gestures=gestures, win_len=400, win_stride=100)
 
 
 
@@ -46,7 +62,7 @@ for j in range(1, 2):
 
 
     # 存储为h5文件
-    file = h5py.File(dir+'/data/Comb_downSeg/DB2_s' + str(j) + 'Seg17_1.h5', 'w')
+    file = h5py.File(dir+'/data/Comb_Seg/DB2_s' + str(j) + 'Seg17_zsc.h5', 'w')
     file.create_dataset('x_train1', data=x_train1.astype('float32'))
     file.create_dataset('x_train3', data=x_train3.astype('float32'))
     file.create_dataset('x_train4', data=x_train4.astype('float32'))

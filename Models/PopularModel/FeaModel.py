@@ -112,7 +112,6 @@ def FeaAway3CBAM():
     inputh1 = KL.Input(shape=(16, 16, 8))
     inputh2 = KL.Input(shape=(16, 16, 2))
     inputh3 = KL.Input(shape=(16, 16, 2))
-    inputl1 = KL.Input(shape=(16, 16, 12))
 
     x1 = KL.Conv2D(filters=64, kernel_size=(2, 2), strides=(1, 1), activation='relu', padding='same')(inputh1)
     x1 = KL.BatchNormalization()(x1)
@@ -135,19 +134,13 @@ def FeaAway3CBAM():
     x3 = KL.BatchNormalization()(x3)
     output3 = cbam_module(x3)
 
-    x4 = KL.Conv2D(filters=64, kernel_size=(2, 2), strides=(1, 1), activation='relu', padding='same')(inputl1)
-    x4 = KL.BatchNormalization()(x4)
-    x4 = cbam_module(x4)
-    x4 = KL.Conv2D(filters=128, kernel_size=(4, 4), strides=(1, 1), activation='relu', padding='same')(x4)
-    x4 = KL.BatchNormalization()(x4)
-    output4 = cbam_module(x1)
 
     c = KL.Concatenate(axis=-2)([output1, output2, output3])
     X = KL.GlobalAvgPool2D()(c)
     X = KL.Dense(128, activation='relu')(X)
     X = KL.Dropout(0.1)(X)
     s = KL.Dense(49, activation='softmax')(X)
-    model = tf.keras.Model(inputs=[inputh1, inputh2, inputh3, inputl1], outputs=s)
+    model = tf.keras.Model(inputs=[inputh1, inputh2, inputh3], outputs=s)
     model.compile(optimizer=tf.keras.optimizers.Adam(lr=0.001),
                   loss='categorical_crossentropy', metrics=['accuracy'])
     return model
@@ -170,3 +163,4 @@ def model1():
     model.compile(optimizer=tf.keras.optimizers.Adam(lr=0.001),
                   loss='categorical_crossentropy', metrics=['accuracy'])
     return model
+

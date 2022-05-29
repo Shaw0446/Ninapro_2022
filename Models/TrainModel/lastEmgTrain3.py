@@ -5,7 +5,7 @@ import nina_funcs as nf
 import matplotlib.pyplot as plt
 import os
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
-from Models.PopularModel.Away3CBAMNEW import Away3reluBNCBAMcatNEW
+from Models.PopularModel.Away3CBAM import reluBNCBAMcat
 from Models.PopularModel.DownAway3CBAM import DownAway3reluBNCBAM
 from Models.PopularModel.EmgNet import EmgCNN, EmgCNN2, EmgAway3reluBConv
 from Util.SepData import Sep3Data
@@ -65,8 +65,8 @@ if __name__ == '__main__':
         Y_test = nf.get_categorical(y_test)
         file.close()
 
-        Xtrain1, Xtrain2, Xtrain3 = Sep3Data(X_train)
-        Xvali1, Xvali2, Xvali3 = Sep3Data(X_test)
+        # Xtrain1, Xtrain2, Xtrain3 = Sep3Data(X_train)
+        # Xvali1, Xvali2, Xvali3 = Sep3Data(X_test)
 
 
         callbacks = [  # 1设置学习率衰减,2保存最优模型
@@ -74,8 +74,8 @@ if __name__ == '__main__':
                               cooldown=0, min_lr=0),
             ModelCheckpoint(filepath=dir+'/DB2_model/DB2_s' + str(j) + 'model.h5'
                             , monitor='val_accuracy', save_best_only=True)]
-        model = Away3reluBNCBAMcatNEW()
-        history = model.fit([Xtrain1, Xtrain2, Xtrain3], Y_train, epochs=50, verbose=2, batch_size=32
+        model = reluBNCBAMcat()
+        history = model.fit(X_train, Y_train, epochs=50, verbose=2, batch_size=32
                             # , callbacks=callbacks)
-                            , validation_data=([Xvali1, Xvali2, Xvali3], Y_test), callbacks=callbacks)
+                            , validation_data=(X_test, Y_test), callbacks=callbacks)
 
