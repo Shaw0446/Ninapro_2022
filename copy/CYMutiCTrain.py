@@ -3,8 +3,8 @@ import tensorflow as tf
 import h5py
 import numpy as np
 import matplotlib.pyplot as plt
-from tensorflow_core.python.keras import Model, Input
-from tensorflow_core.python.keras.layers import Bidirectional, Conv2D, MaxPooling2D, Flatten, concatenate, Dropout, \
+from tensorflow.keras import Model, Input
+from tensorflow.keras.layers import Bidirectional, Conv2D, MaxPooling2D, Flatten, concatenate, Dropout, \
     Dense, LSTM
 
 

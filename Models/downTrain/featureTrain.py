@@ -29,13 +29,16 @@ def pltCurve(loss, val_loss, accuracy, val_accuracy):
     plt.show()
 
 if __name__ == '__main__':
-
     for j in range(1,2):
-        feaFile = h5py.File(dir+'/data/down_Fea/DB2_s' + str(j) + 'fea.h5', 'r')
+        File = h5py.File(dir+'/data/down_Fea/DB2_s' + str(j) + 'fea17.h5', 'r')
         #将六次重复手势分开存储
-        x_train, x_test = feaFile['x_train'][:], feaFile['x_test'][:]
-        y_train, y_test = feaFile['y_train'][:], feaFile['y_test'][:]
-        feaFile.close()
+        f1, f3, f4, f6 = File['fea_train1'][:], File['fea_train3'][:], File['fea_train4'][:], File['fea_train6'][:]
+        y1, y3, y4, y6 = File['y_train1'][:], File['y_train3'][:], File['y_train4'][:], File['y_train6'][:]
+        x_train = np.concatenate([f1, f3, f4, f6], axis=0)
+        y_train = np.concatenate([y1, y3, y4, y6], axis=0)
+        x_test, y_test = File['fea_test'][:], File['y_test'][:]
+
+        File.close()
         Y_train = nf.get_categorical(y_train)
         Y_test = nf.get_categorical(y_test)
 
