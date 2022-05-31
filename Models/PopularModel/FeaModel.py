@@ -1,6 +1,7 @@
 import tensorflow as tf
 from tensorflow.keras import backend as K
 from tensorflow.keras import layers as KL
+from tensorflow.python.keras import regularizers
 
 channel_axis = 1 if K.image_data_format() == "channels_first" else 3
 
@@ -150,14 +151,17 @@ def FeaAway3CBAM():
 def model1():
     input1 = KL.Input(shape=(36,1))
 
-    x1 = KL.Conv1D(filters=64, kernel_size=3, strides=1, activation='relu', padding='valid')(input1)
-    x1 = KL.MaxPool1D(pool_size=2, strides=1, padding='valid')(x1)
-    x1 = KL.Conv1D(filters=64, kernel_size=5, strides=1, activation='relu', padding='valid')(x1)
-    x1 = KL.MaxPool1D(pool_size=2, strides=1, padding='valid')(x1)
-    x1 = KL.Dropout(0.1)(x1)
+    x1 = KL.Conv1D(filters=64, kernel_size=3, strides=1, activation='relu', kernel_regularizer=regularizers.l2(0.01), padding='same')(input1)
+    # x1 = KL.MaxPool1D(pool_size=2, strides=1, padding='same')(x1)
+    x1 = KL.BatchNormalization()(x1)
+    x1 = KL.Conv1D(filters=64, kernel_size=5, strides=1, activation='relu', kernel_regularizer=regularizers.l2(0.01), padding='same')(x1)
+    x1 = KL.BatchNormalization()(x1)
+
+    # x1 = KL.MaxPool1D(pool_size=2, strides=1, padding='same')(x1)
+    x1 = KL.Dropout(0.2)(x1)
     x1 = KL.Dense(256, activation='relu')(x1)
     X = KL.Dropout(0.2)(x1)
-    X = KL.GlobalAvgPool1D()(X)
+    X = KL.Flatten()(X)
     s = KL.Dense(17, activation='softmax')(X)
     model = tf.keras.Model(inputs=input1, outputs=s)
     model.compile(optimizer=tf.keras.optimizers.Adam(lr=0.001),

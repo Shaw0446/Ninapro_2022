@@ -18,11 +18,12 @@ def DB_normalise(data, train_reps, channel=12):
     x = [np.where(data.values[:, channel + 1] == rep) for rep in train_reps]
     indices = np.squeeze(np.concatenate(x, axis=-1))
     train_data = data.iloc[indices, :]
+    # reset_index对行号重新排序
     train_data = data.reset_index(drop=True)
-    scaler = preprocessing.StandardScaler(with_mean=True,
-                            with_std=True,
-                            copy=False).fit(train_data.iloc[:, :channel])
-
+    # scaler = preprocessing.StandardScaler(with_mean=True,
+    #                         with_std=True,
+    #                         copy=False).fit(train_data.iloc[:, :channel])
+    scaler = preprocessing.MinMaxScaler().fit(train_data.iloc[:, :channel])
     scaled = scaler.transform(data.iloc[:, :channel])
     normalised = pd.DataFrame(scaled)
     normalised['stimulus'] = data['stimulus'].values
@@ -35,14 +36,11 @@ if __name__ == '__main__':
         df = pd.read_hdf(dir+'/data/down/DB2_s' + str(j) + 'down.h5', 'df')
 
         '''标准化'''
-        # scaler = preprocessing.StandardScaler()
-        # df1 = DB_normalise(df.copy(deep=True), train_reps)
-        # df2 = df1.copy(deep=True)
-        # df2.iloc[:, :12] = df2.iloc[:, :12]
-        # df2 = df2.astype(np.float32)
+        df1 = DB_normalise(df.copy(deep=True), train_reps)
+
         ''' 滑动窗口分割'''
-        x_train, y_train, r_train = nf.windowing(df, reps=train_reps, gestures=gestures, win_len=20, win_stride=1)
-        x_test, y_test, r_test = nf.windowing(df, reps=test_reps, gestures=gestures, win_len=20, win_stride=1)
+        x_train, y_train, r_train = nf.windowing(df1, reps=train_reps, gestures=gestures, win_len=20, win_stride=1)
+        x_test, y_test, r_test = nf.windowing(df1, reps=test_reps, gestures=gestures, win_len=20, win_stride=1)
 
 
 
