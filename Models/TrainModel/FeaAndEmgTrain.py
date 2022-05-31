@@ -32,19 +32,18 @@ def pltCurve(loss, val_loss, accuracy, val_accuracy):
 
 if __name__ == '__main__':
     for j in range(1,2):
-        file1 = h5py.File(dir+'/lastdata/Seg/DB2_s' + str(j) + 'Seg.h5', 'r')
-        emg1, emg3, emg4, emg6 = file1['Data1'][:], file1['Data3'][:], file1['Data4'][:], file1['Data6'][:]
-        label1, label3, label4, label6 = file1['label1'][:], file1['label3'][:], file1['label4'][:], file1['label6'][:]
-        emg2, emg5 = file1['Data2'][:], file1['Data5'][:]
-        label2, label5 = file1['label2'][:], file1['label5'][:]
+        file = h5py.File(dir + '/data/Comb_Seg/DB2_s' + str(j) + 'Seg.h5', 'r')
+        emg1, emg3, emg4, emg6 = file['x_train1'][:], file['x_train3'][:], file['x_train4'][:], file['x_train6'][:]
+        label1, label3, label4, label6 = file['y_train1'][:],file['y_train3'][:],file['y_train4'][:],file['y_train6'][:]
+
 
         X_train = np.concatenate([emg1, emg3, emg4, emg6], axis=0)
         y_train = np.concatenate([label1, label3, label4, label6], axis=0)
         Y_train = nf.get_categorical(y_train)
-        X_test = np.concatenate([emg2, emg5], axis=0)
-        y_test = np.concatenate([label2, label5], axis=0)
+        X_test = file['x_test'][:]
+        y_test = file['y_test'][:]
         Y_test = nf.get_categorical(y_test)
-        file1.close()
+        file.close()
 
         feaFile = h5py.File(dir+'/data/Fea/DB2_s' + str(j) + 'fea.h5', 'r')
         # 将六次重复手势分开存储

@@ -21,7 +21,7 @@ def fea_transpose(data):
 
 
 for j in range(1, 2):
-    file = h5py.File(dir + '/data/Comb_Seg/DB2_s' + str(j) + 'Seg.h5', 'r')
+    file = h5py.File(dir + '/data/Comb_downSeg/DB2_s' + str(j) + 'Seg17.h5', 'r')
     '''step1: 数据集划分'''
     emg1, emg3, emg4, emg6 = file['x_train1'][:], file['x_train3'][:], file['x_train4'][:], file['x_train6'][:]
     label1, label3, label4, label6 = file['y_train1'][:], file['y_train3'][:], file['y_train4'][:], file['y_train6'][:]

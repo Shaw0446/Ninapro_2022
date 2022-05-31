@@ -5,20 +5,13 @@ import scipy.signal as signal
 import nina_funcs as nf
 from sklearn import preprocessing
 
+from Preprocess.Combination import dataCombin
+
 train_reps = [1, 3, 4, 6]
 test_reps = [2, 5]
 gestures = list(range(1, 50))
 dir='F:/DB2'
 
-'''对nina_funcs继续扩展的从训练集中划分验证集'''
-def dataCombin(data, label, rep_arr, reps):
-    if reps:
-        x = [np.where(rep_arr[:] == rep) for rep in reps]
-        target_indices = np.squeeze(np.concatenate(x, axis=-1))
-        target_data = data[target_indices, :]
-        target_label = label[target_indices]
-
-    return target_data, target_label
 
 
 def DB_normalise(data, train_reps, channel=12):
