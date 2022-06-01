@@ -52,7 +52,7 @@ def FeaAway3CBAM():
 
 
 def FeaAndEmg_model1():
-    input1 = KL.Input(shape=(400,12))
+    input1 = KL.Input(shape=(20,12))
     input11 = tf.expand_dims(input=input1, axis=3)
     input2 = KL.Input(shape=(36, 1))
 
@@ -75,7 +75,7 @@ def FeaAndEmg_model1():
     X = KL.Concatenate(axis=-1)([x1,x2])
     X = KL.Dense(256, activation='relu')(X)
     X = KL.Dropout(0.2)(X)
-    s = KL.Dense(49, activation='softmax')(X)
+    s = KL.Dense(17, activation='softmax')(X)
     model = tf.keras.Model(inputs=[input1,input2], outputs=s)
     model.compile(optimizer=tf.keras.optimizers.Adam(lr=0.001),
                   loss='categorical_crossentropy', metrics=['accuracy'])

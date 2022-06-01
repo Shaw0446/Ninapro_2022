@@ -40,13 +40,13 @@ if __name__ == '__main__':
         file = h5py.File(dir+'/data/Comb_downSeg/DB2_s' + str(j) + 'Seg17.h5', 'r')
         emg1, emg3, emg4, emg6 = file['x_train1'][:], file['x_train3'][:], file['x_train4'][:], file['x_train6'][:]
         label1, label3, label4, label6 = file['y_train1'][:],file['y_train3'][:],file['y_train4'][:],file['y_train6'][:]
-        emg2, emg5 = file['Data2'][:], file['Data5'][:]
-        label2, label5 = file['label2'][:], file['label5'][:]
+        emg_test = file['x_test'][:]
+        label_test = file['y_test'][:]
 
-        X_train = np.concatenate([emg1, emg3, emg4, emg6], axis=0)
+        emg_train = np.concatenate([emg1, emg3, emg4, emg6], axis=0)
         Y_train = nf.get_categorical(np.concatenate([label1, label3, label4, label6], axis=0))
-        X_test = np.concatenate([emg2, emg5], axis=0)
-        Y_test = nf.get_categorical(np.concatenate([label2, label5], axis=0))
+
+        Y_test = nf.get_categorical(label_test)
         file.close()
 
 
@@ -71,7 +71,7 @@ if __name__ == '__main__':
             ModelCheckpoint(filepath=dir+'/DB2_model/DB2_s' + str(j) + 'model.h5'
                             , monitor='val_accuracy', save_best_only=True)]
         model = FeaAndEmg_model1()
-        history = model.fit([X_train, fea_train], Y_train, epochs=50, verbose=2, batch_size=32
+        history = model.fit([emg_train, fea_train], Y_train, epochs=50, verbose=2, batch_size=32
                             # , callbacks=callbacks)
-                            , validation_data=([X_test, fea_test], Y_test), callbacks=callbacks)
+                            , validation_data=([emg_test, fea_test], Y_test), callbacks=callbacks)
 
