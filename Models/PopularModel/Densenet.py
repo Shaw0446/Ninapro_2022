@@ -5,7 +5,7 @@ import tensorflow.keras.layers as KL
 
 # model
 def DenseLayer(x, nb_filter, bn_size=4, alpha=0.0,drop_rate=0.2):
-    # Bottleneck layers
+    # Bottleneck DBlayers
     # 1x1 Conv的作用是降低特征数量
     x = KL.BatchNormalization(axis=3)(x)
     x = KL.LeakyReLU(alpha=alpha)(x)
@@ -91,7 +91,7 @@ def newDenseNet():
 #
 # def dense_block(x, stage, nb_layers, nb_filter, growth_rate, dropout_rate=None,
 #                 grow_nb_filters=True, name=None):
-#     concat_feat = x  # store the last layer output
+#     concat_feat = x  # store the last DBlayers output
 #
 #     for i in range(nb_layers):
 #
@@ -137,7 +137,7 @@ def newDenseNet():
 #     x = KL.ZeroPadding2D((1, 1), name='pool1_zeropadding')(x)
 #     x = KL.MaxPooling2D((3, 3), strides=(2, 2), name='pool1')(x)
 #
-#     # Dense block and Transition layer
+#     # Dense block and Transition DBlayers
 #     for block_id in range(nb_dense_block - 1):
 #         stage = block_id + 2  # start from 2
 #         x, nb_filter = dense_block(x, stage, nb_layers[block_id], nb_filter, growth_rate,
@@ -150,7 +150,7 @@ def newDenseNet():
 #     x, nb_filter = dense_block(x, final_stage, nb_layers[-1], nb_filter, growth_rate,
 #                                dropout_rate=dropout_rate, name='Dense')
 #
-#     # top layer
+#     # top DBlayers
 #     x = KL.BatchNormalization(name='final_conv_bn')(x)
 #     x = KL.Activation('relu', name='final_act')(x)
 #     x = KL.GlobalAveragePooling2D(name='final_pooling')(x)

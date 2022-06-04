@@ -25,11 +25,11 @@ def process_dataset_for_oneSubject(_subject):
     emg = np.vstack([emg1,emg2,emg3])
     restimulus = np.vstack([restimulus1,restimulus2,restimulus3]).astype('int')
     rerepetition = np.vstack([rerepetition1,rerepetition2,rerepetition3]).astype('int')
-    if not os.path.exists('../data/ninapro/db1_processed/{}'.format(_subject)):
-        os.makedirs('../data/ninapro/db1_processed/{}'.format(_subject))
-    np.savetxt('../data/ninapro/db1_processed/{}/emg.txt'.format(_subject), emg)
-    np.savetxt('../data/ninapro/db1_processed/{}/restimulus.txt'.format(_subject), restimulus, fmt="%d")
-    np.savetxt('../data/ninapro/db1_processed/{}/rerepetition.txt'.format(_subject), rerepetition, fmt="%d")
+    if not os.path.exists( dir+'txt_processed/{}'.format(_subject)):
+        os.makedirs( dir+'txt_processed/{}'.format(_subject))
+    np.savetxt(dir + 'txt_processed/{}/emg.txt'.format(_subject), emg)
+    np.savetxt(dir+'txt_processed/{}/restimulus.txt'.format(_subject), restimulus, fmt="%d")
+    np.savetxt(dir+'txt_processed/{}/rerepetition.txt'.format(_subject), rerepetition, fmt="%d")
 
 if __name__ == '__main__':
     _subjects = sorted(os.listdir(dir+'/'))
