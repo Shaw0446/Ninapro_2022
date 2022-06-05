@@ -5,10 +5,9 @@ import nina_funcs as nf
 import matplotlib.pyplot as plt
 import os
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
-from Models.PopularModel.Away3CBAM import reluBNCBAMcat
-from Models.PopularModel.DownAway3CBAM import DownAway3reluBNCBAM
+
 from Models.PopularModel.EmgNet import EmgCNN, EmgCNN2, EmgAway3reluBConv
-from Models.PopularModel.FeaAndEmg import FeaAndEmg_model1
+from Models.lastTrain.modelFile import FeaAndEmg_model2
 from Util.SepData import Sep3Data
 from tfdeterminism import patch
 dir='F:/DB2'
@@ -71,7 +70,7 @@ if __name__ == '__main__':
                               cooldown=0, min_lr=0),
             ModelCheckpoint(filepath=dir+'/DB2_model/DB2_s' + str(j) + 'model.h5'
                             , monitor='val_accuracy', save_best_only=True)]
-        model =FeaAndEmg_model1()
+        model =FeaAndEmg_model2()
         history = model.fit([X_train, fea_train], Y_train, epochs=50, verbose=2, batch_size=32
                             # , callbacks=callbacks)
                             , validation_data=([X_test, fea_test], Y_test), callbacks=callbacks)

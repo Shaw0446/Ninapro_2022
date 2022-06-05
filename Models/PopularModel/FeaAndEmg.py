@@ -4,6 +4,7 @@ from tensorflow.keras import layers as KL
 
 from Models.PopularModel.Away3CBAM import cbam_acquisition, cbam_time
 from Models.PopularModel.FeaModel import cbam_module
+from Models.lastTrain.daNet import danet_resnet101
 
 
 def FeaAway3CBAM():
@@ -57,13 +58,16 @@ def FeaAndEmg_model1():
     input2 = KL.Input(shape=(36, 1))
 
     # 早期融合网络，加入1×1卷积
-    x1 = KL.Conv2D(filters=64, kernel_size=(8, 1), strides=(1, 1), activation='relu', padding='same')(input11)
-    x1 = KL.BatchNormalization()(x1)
-    x1 = cbam_time(x1)
-    x1 = KL.Conv2D(filters=128, kernel_size=(1, 8), strides=(1, 1), activation='relu', padding='same')(x1)
-    x1 = KL.BatchNormalization()(x1)
-    x1 = cbam_acquisition(x1)
-    x1 = KL.GlobalAvgPool2D()(x1)
+    # x1 = KL.Conv2D(filters=64, kernel_size=(8, 1), strides=(1, 1), activation='relu', padding='same')(input11)
+    # x1 = KL.BatchNormalization()(x1)
+    # x1 = cbam_time(x1)
+    # x1 = KL.Conv2D(filters=128, kernel_size=(1, 8), strides=(1, 1), activation='relu', padding='same')(x1)
+    # x1 = KL.BatchNormalization()(x1)
+    # x1 = cbam_acquisition(x1)
+    # x1 = KL.GlobalAvgPool2D()(x1)
+    x1 = danet_resnet101(input11, 17)
+
+
 
     x2 = KL.Conv1D(filters=64, kernel_size=3, strides=1, activation='relu', padding='valid')(input2)
     x2 = KL.MaxPool1D(pool_size=2, strides=1, padding='valid')(x2)

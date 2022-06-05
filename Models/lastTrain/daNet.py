@@ -68,8 +68,8 @@ def bottleneck_Block(input, out_filters, strides=(1, 1), dilation=(1, 1), with_c
     return x
 
 
-def danet_resnet101(height, width, channel, classes):
-    input = Input(shape=(height, width, channel))
+def danet_resnet101(init, classes):
+    input = Input(shape=init)
 
     conv1_1 = Conv2D(64, 7, strides=(2, 2), padding='same', use_bias=False, kernel_initializer='he_normal')(input)
     conv1_1 = BatchNormalization(axis=3)(conv1_1)
