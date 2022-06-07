@@ -3,6 +3,7 @@ import tensorflow.keras.backend as K
 import tensorflow as tf
 from tensorflow.keras.layers import Layer
 
+channel_axis = 1 if K.image_data_format() == "channels_first" else 3
 
 class PAM(Layer):
     def __init__(self,

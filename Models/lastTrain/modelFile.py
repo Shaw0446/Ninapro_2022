@@ -8,7 +8,7 @@ from Models.lastTrain.daNet import danet_resnet101
 
 
 
-def FeaAndEmg_model2():
+def FeaAndEmg_model1():
     input1 = KL.Input(shape=(400,12))
     input11 = tf.expand_dims(input=input1, axis=3)
     input2 = KL.Input(shape=(36, 1))
@@ -21,7 +21,7 @@ def FeaAndEmg_model2():
     x1 = KL.BatchNormalization()(x1)
     x1 = cbam_acquisition(x1)
     x1 = KL.GlobalAvgPool2D()(x1)
-    # x1 = danet_resnet101(input11, 17)
+    x1 = danet_resnet101(input11, 17)
 
 
 
@@ -36,6 +36,33 @@ def FeaAndEmg_model2():
     X = KL.Dense(256, activation='relu')(X)
     X = KL.Dropout(0.2)(X)
     s = KL.Dense(17, activation='softmax')(X)
+    model = tf.keras.Model(inputs=[input1,input2], outputs=s)
+    model.compile(optimizer=tf.keras.optimizers.Adam(lr=0.001),
+                  loss='categorical_crossentropy', metrics=['accuracy'])
+    return model
+
+
+def FeaAndEmgsoft_model():
+    input1 = KL.Input(shape=(400,12))
+    # input11 = tf.expand_dims(input=input1, axis=3)
+    input11 = KL.Reshape(target_shape=(20, 20, 12))(input1)
+    input2 = KL.Input(shape=(36, 1))
+
+    # 早期融合网络，加入1×1卷积
+    n, row, col, channels =  input11.shape
+    s1 = danet_resnet101(row, col, channels, 17)
+
+
+    x2 = KL.Conv1D(filters=64, kernel_size=3, strides=1, activation='relu', padding='valid')(input2)
+    x2 = KL.MaxPool1D(pool_size=2, strides=1, padding='valid')(x2)
+    x2 = KL.Conv1D(filters=128, kernel_size=5, strides=1, activation='relu', padding='valid')(x2)
+    x2 = KL.MaxPool1D(pool_size=2, strides=1, padding='valid')(x2)
+    x2 = KL.GlobalAvgPool1D()(x2)
+    X = KL.Dense(256, activation='relu')(x2)
+    X = KL.Dropout(0.2)(X)
+    s2 = KL.Dense(17, activation='softmax')(X)
+
+    s = KL.Add()([s1, s2])
     model = tf.keras.Model(inputs=[input1,input2], outputs=s)
     model.compile(optimizer=tf.keras.optimizers.Adam(lr=0.001),
                   loss='categorical_crossentropy', metrics=['accuracy'])

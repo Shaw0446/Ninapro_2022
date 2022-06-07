@@ -22,12 +22,13 @@ dir='F:/DB2'
 def action_seg(data, channel, endlabel):
     actionList = []  # 存储动作
     begin = 0
-    for aim in tqdm(range(len(data) - 1)):
+    for aim in tqdm(range(len(data))):
         # 控制手势停止时间
+        aaa=data.iloc[aim, channel]
         if (data.iloc[aim, channel] == endlabel + 1):
             break;
-        if (aim == len(data) - 1 or data.iloc[aim, channel] != data.iloc[aim + 1, 12]):
-            end = aim
+        if (aim == len(data) - 1 or data.iloc[aim, channel] != data.iloc[aim - 1, channel]):
+            end = aim-1
             actionList.append(data[begin:end])
             begin = end + 1
     return actionList
@@ -142,20 +143,21 @@ for j in range(1, 2):
     # unList = uniform(actionList, 12)
     bnlist=bnEnhancesegment(actionList)
     emgList, labelList = action_comb(bnlist, 400, 100)
+    x_test = np.concatenate([emgList[2], emgList[5]], axis=0)
+    y_test = np.concatenate([labelList[2], labelList[5]], axis=0)
     # # 存储为h5文件
     file = h5py.File(dir+'/lastdata/Seg/DB2_s' + str(j) + 'Seg.h5', 'w')
-    file.create_dataset('Data1', data=(emgList[1]).astype('float32'))
-    file.create_dataset('Data2', data=(emgList[2]).astype('float32'))
-    file.create_dataset('Data3', data=(emgList[3]).astype('float32'))
-    file.create_dataset('Data4', data=(emgList[4]).astype('float32'))
-    file.create_dataset('Data5', data=(emgList[5]).astype('float32'))
-    file.create_dataset('Data6', data=(emgList[6]).astype('float32'))
-    file.create_dataset('label1', data=(labelList[1]).astype('int'))
-    file.create_dataset('label2', data=(labelList[2]).astype('int'))
-    file.create_dataset('label3', data=(labelList[3]).astype('int'))
-    file.create_dataset('label4', data=(labelList[4]).astype('int'))
-    file.create_dataset('label5', data=(labelList[5]).astype('int'))
-    file.create_dataset('label6', data=(labelList[6]).astype('int'))
+    file.create_dataset('emg1', data=(emgList[1]).astype('float32'))
+    file.create_dataset('emg3', data=(emgList[3]).astype('float32'))
+    file.create_dataset('emg4', data=(emgList[4]).astype('float32'))
+    file.create_dataset('emg6', data=(emgList[6]).astype('float32'))
+    file.create_dataset('y_train1', data=(labelList[1]).astype('int'))
+    file.create_dataset('y_train3', data=(labelList[3]).astype('int'))
+    file.create_dataset('y_train4', data=(labelList[4]).astype('int'))
+    file.create_dataset('y_train6', data=(labelList[6]).astype('int'))
+
+    file.create_dataset('emg_test', data=x_test.astype('float32'))
+    file.create_dataset('y_test', data=y_test.astype('int'))
     file.close()
     print('******************DB2_s' + str(j) + '分割完成***********************')
 
