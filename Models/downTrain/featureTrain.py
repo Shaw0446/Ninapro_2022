@@ -2,10 +2,9 @@ import tensorflow as tf
 import h5py
 import numpy as np
 import matplotlib.pyplot as plt
-from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
+from tensorflow.keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 import nina_funcs as nf
-from Models.PopularModel.FeaModel import FeaAway3CBAM, Stage1, Stage2, model1
-from Util.SepData import Sep3Data, Sep3Fea
+from Models.DBFeaNet.FeaModel import model1
 from tfdeterminism import patch
 dir='F:/DB2'
 

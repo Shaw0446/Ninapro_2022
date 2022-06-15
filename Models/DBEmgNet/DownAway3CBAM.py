@@ -1,11 +1,8 @@
 import tensorflow as tf
-from tensorflow.keras import backend as K
 from tensorflow.keras import layers as KL
 
-
-
 # 3条支路，每个支路做串行的卷积注意力,在网络层加入标准化，注意顺序,早期网络加入1×1卷积
-from Models.PopularModel.Away3CBAM import cbam_time, cbam_acquisition
+from Models.DBEmgNet.CBAMFile import cbam_time, cbam_acquisition
 
 
 def DownAway3reluBNCBAM():

@@ -14,7 +14,7 @@ gestures = list(range(1,50))
 dir='F:/DB2'
 
 
-def plot_feature_scores(x, y, names=None):
+def plot_feature_scores(x, y, names=None, chname=None):
     if not names:
         names = range(len(x[0]))
 
@@ -37,10 +37,10 @@ def plot_feature_scores(x, y, names=None):
     ax.barh(y_pos, sorted_scores, height=0.7, align='center', color='#AAAAAA', tick_label=sorted_names)
     # ax.set_yticklabels(sorted_names)      # 也可以在这里设置“条条”的标签~
     ax.set_yticks(y_pos)
-    ax.set_xlabel('Feature Score')
+    ax.set_xlabel(chname+' Feature Score')
     ax.set_ylabel('Feature Name')
     ax.invert_yaxis()
-    ax.set_title('F_classif scores of the features.')
+    ax.set_title('F_class if scores of the features.')
 
     # 4. 添加每个“条条”的数字标签
     for score, pos in zip(sorted_scores, y_pos):
@@ -51,25 +51,22 @@ def plot_feature_scores(x, y, names=None):
 
 
 for j in range(1, 2):
-    file = h5py.File(dir+'/data/Comb_downSeg/DB2_s' + str(j) + 'Seg17.h5', 'r')
-    '''step1: 数据集划分'''
-    x_train1, x_train3, x_train4, x_train6 = file['x_train1'][:], file['x_train3'][:], file['x_train4'][:], file['x_train6'][:]
-    y_train1, y_train3, y_train4, y_train6 = file['y_train1'][:], file['y_train3'][:], file['y_train4'][:], file['y_train6'][:]
-    x_test = file['x_test'][:]
-    y_test = file['y_test'][:]
-    file.close()
+    file = h5py.File(dir + '/lastdata/Seg/DB2_s' + str(j) + 'Seg.h5', 'r')
+    emg1, emg3, emg4, emg6 = file['emg1'][:], file['emg3'][:], file['emg4'][:], file['emg6'][:]
+    y1, y3, y4, y6 = file['y1'][:], file['y3'][:], file['y4'][:], file['y6'][:]
 
-    x_train = np.concatenate([x_train1, x_train3, x_train4, x_train6], axis=0)
-    y_train = np.concatenate([y_train1, y_train3, y_train4, y_train6], axis=0)
+    x_train = np.concatenate([emg1, emg3, emg4, emg6 ], axis=0)
+    y_train = np.concatenate([y1, y3, y4, y6], axis=0)
 
     '''step2: 选择特征组合和归一化'''
     # 选择特征组合
-    features = [nf.rms,nf.iemg,nf.min,nf.max]
-    # features = [nf.emg_dwpt, nf.iemg,nf.rms,nf.hist,nf.entropy,nf.kurtosis,nf.zero_cross,nf.min,nf.max,nf.mean,nf.median,nf.psd]
-    temp = x_train[:, :, :1]
+    # features = [nf.iemg]
+    ch = 4
+    features = [nf.iemg, nf.rms, nf.entropy, nf.kurtosis, nf.zero_cross, nf.min, nf.max, nf.mean, nf.median]
+    temp = x_train[:, :, ch - 1]
+    temp = temp.reshape(temp.shape[0], temp.shape[1], -1)
     train_feature = nf.feature_extractor(features=features, shape=(temp.shape[0], -1), data=temp)
     # test_feature = nf.feature_extractor(features, (x_test.shape[0], -1), x_test)
-    aaa = x_train[:, :, 0]
-    # fea_name=['emg_dwpt', 'iemg','rms','hist','entropy','kurtosis','zero_cross','min','max','mean','median','fft','psd']
-    fea_name = [ 'rms', 'iemg', 'min','max']
-    plot_feature_scores(np.array(train_feature),y_train,names=fea_name)
+    fea_name = ['iemg', 'rms', 'entropy', 'kurtosis', 'zero_cross', 'min', 'max', 'mean', 'median']
+    # fea_name = [ 'rms', 'iemg', 'min','max']
+    plot_feature_scores(np.array(train_feature), y_train, names=fea_name, chname='ch' + str(ch))

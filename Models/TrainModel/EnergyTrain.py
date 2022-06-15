@@ -9,7 +9,7 @@ from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLRO
 from Models.PopularModel.Energy import EnergyCNN
 from Util.SepData import Sep3Data
 from tfdeterminism import patch
-dir='F:/DB2'
+root_data='F:/DB2'
 
 #确定随机数
 patch()
@@ -33,7 +33,7 @@ def pltCurve(loss, val_loss, accuracy, val_accuracy):
 
 if __name__ == '__main__':
     for j in range(1,2):
-        file = h5py.File(dir+'/data/energy_map/DB2_s' + str(j) + 'map17.h5', 'r')
+        file = h5py.File(root_data+'/data/energy_map/DB2_s' + str(j) + 'map17.h5', 'r')
         # 数据集划分呢
         map1, map3, map4, map6 = file['map1'][:], file['map3'][:], file['map4'][:], file['map6'][:]
         y_train1, y_train3, y_train4, y_train6 = file['y_train1'][:], file['y_train3'][:], file['y_train4'][:], file['y_train6'][:]
@@ -51,7 +51,7 @@ if __name__ == '__main__':
         callbacks = [#1设置学习率衰减,2保存最优模型
             ReduceLROnPlateau(monitor='val_accuracy', factor=0.1, patience=5, mode='auto', min_delta=0.0001,
                               cooldown=0, min_lr=0),
-            ModelCheckpoint(filepath=dir+'/DB2_model/DB2_s' + str(j) + 'model.h5'
+            ModelCheckpoint(filepath=root_data+'/DB2_model/DB2_s' + str(j) + 'model.h5'
             , monitor='val_accuracy', save_best_only=True)]
         model = EnergyCNN()
         history = model.fit(X_train, Y_train, epochs=100, verbose=2, batch_size=64

@@ -2,14 +2,12 @@ import tensorflow as tf
 import h5py
 import numpy as np
 import matplotlib.pyplot as plt
-from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
+from tensorflow.keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 import nina_funcs as nf
 
-from Models.PopularModel.FeaAndEmg import FeaAndEmg_model1
-from Models.PopularModel.FeaModel import FeaAway3CBAM, Stage1, Stage2, model1
-from Util.SepData import Sep3Data, Sep3Fea
+from Models.DBFeaEmgNet.FeaEmgFile import FeaAndEmg_model1
 from tfdeterminism import patch
-dir='F:/DB2'
+root_data='F:/DB2'
 
 #确定随机数
 patch()
@@ -32,7 +30,7 @@ def pltCurve(loss, val_loss, accuracy, val_accuracy):
 
 if __name__ == '__main__':
     for j in range(1,2):
-        file = h5py.File(dir + '/data/Comb_Seg/DB2_s' + str(j) + 'Seg.h5', 'r')
+        file = h5py.File(root_data + '/data/Comb_Seg/DB2_s' + str(j) + 'Seg.h5', 'r')
         emg1, emg3, emg4, emg6 = file['x_train1'][:], file['x_train3'][:], file['x_train4'][:], file['x_train6'][:]
         label1, label3, label4, label6 = file['y_train1'][:],file['y_train3'][:],file['y_train4'][:],file['y_train6'][:]
 
@@ -45,27 +43,28 @@ if __name__ == '__main__':
         Y_test = nf.get_categorical(y_test)
         file.close()
 
-        feaFile = h5py.File(dir+'/data/Fea/DB2_s' + str(j) + 'fea.h5', 'r')
+        feaFile = h5py.File(root_data + '/data/Fea/DB2_s' + str(j) + 'fea.h5', 'r')
         # 将六次重复手势分开存储
-        fea_train1, fea_train3,fea_train4,fea_train6 = feaFile['fea_train1'][:], feaFile['fea_train3'][:],feaFile['fea_train4'][:], feaFile['fea_train6'][:]
-        fea_label1, fea_label3,fea_label4,fea_label6 = feaFile['fea_label1'][:], feaFile['fea_label3'][:],feaFile['fea_label4'][:], feaFile['fea_label6'][:]
-        fea_test = feaFile['fea_test'][:],
-        fea_testLabel = feaFile['fea_testLabel'][:]
+        fea_x1, fea_x3, fea_x4, fea_x6 = feaFile['fea_x1'][:], feaFile['fea_x3'][:] \
+            , feaFile['fea_x4'][:], feaFile['fea_x6'][:]
+        fea_y1, fea_y3, fea_y4, fea_y6 = feaFile['fea_y1'][:], feaFile['fea_y3'][:] \
+            , feaFile['fea_y4'][:], feaFile['fea_y6'][:]
+        fea_xtest = feaFile['fea_xtest'][:]
+        fea_ytest = feaFile['fea_ytest'][:]
         feaFile.close()
 
-        fea_train = np.concatenate([fea_train1, fea_train3,fea_train4,fea_train6], axis=0)
-        fea_trainLabel = np.concatenate([fea_label1, fea_label3, fea_label4, fea_label6], axis=0)
-
+        fea_train = np.concatenate([fea_x1, fea_x3, fea_x4], axis=0)
+        fea_trainLabel = np.concatenate([fea_y1, fea_y3, fea_y4], axis=0)
 
         callbacks = [#1设置学习率衰减,2保存最优模型
             # EarlyStopping(monitor='val_accuracy', patience=5),
             ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=5, verbose=0, mode='auto', min_delta=0.0001,
                               cooldown=0, min_lr=0),
-            ModelCheckpoint(filepath=dir+'/DB2_model/DB2_s' + str(j) + 'Fea.h5'
+            ModelCheckpoint(filepath=root_data+'/DB2_model/DB2_s' + str(j) + 'Fea.h5'
             , monitor='val_accuracy', save_best_only=True)]
         model = FeaAndEmg_model1()
         history = model.fit([X_train, fea_train], Y_train, epochs=100, verbose=2, batch_size=32
-                            , validation_data=([X_test,fea_test ], Y_test), callbacks=callbacks)
+                            , validation_data=([X_test,fea_xtest], Y_test), callbacks=callbacks)
 
         # loss= history.history['loss']
         # val_loss = history.history['val_loss']

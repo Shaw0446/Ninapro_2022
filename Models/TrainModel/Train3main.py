@@ -5,9 +5,11 @@ import nina_funcs as nf
 import matplotlib.pyplot as plt
 import os
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
+
+from Models.DBEmgNet.CBAMFile import Away3reluBNCBAMcat
 from Util.SepData import Sep3Data
 from tfdeterminism import patch
-dir='F:/DB2'
+root_data='F:/DB2'
 
 #确定随机数
 os.environ['TF_DETERMINISTIC_OPS'] = '1'
@@ -32,7 +34,7 @@ def pltCurve(loss, val_loss, accuracy, val_accuracy):
 
 if __name__ == '__main__':
     for j in range(1, 2):
-        file = h5py.File(dir + '/data/Seg/DB2_s' + str(j) + 'Seg.h5', 'r')
+        file = h5py.File(root_data + '/data/Seg/DB2_s' + str(j) + 'Seg.h5', 'r')
         # 数据集划分呢
         X_train, y_train, r_train = file['x_train'][:], file['y_train'][:], file['r_train'][:]
         X_test, y_test, r_test = file['x_test'][:], file['y_test'][:], file['r_test'][:]
@@ -47,9 +49,9 @@ if __name__ == '__main__':
         callbacks = [#1设置学习率衰减,2保存最优模型
             # ReduceLROnPlateau(monitor='val_accuracy', factor=0.1, patience=10, verbose=0, mode='auto', min_delta=0.0001,
             #                   cooldown=0, min_lr=0),
-            ModelCheckpoint(filepath=dir+'/DB2_model/DB2_s' + str(j) + 'seg.h5'
+            ModelCheckpoint(filepath=root_data+'/DB2_model/DB2_s' + str(j) + 'seg.h5'
             , monitor='val_accuracy', save_best_only=True)]
-        model = Away3reluBNCBAMcatNEW()
+        model = Away3reluBNCBAMcat()
         history = model.fit([Xtrain1, Xtrain2, Xtrain3], Y_train, epochs=50, verbose=2, batch_size=64
             ,validation_data=([Xvali1, Xvali2, Xvali3],Y_vali), callbacks=callbacks)
 

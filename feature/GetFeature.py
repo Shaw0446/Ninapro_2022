@@ -24,26 +24,26 @@ if __name__ == '__main__':
         file = h5py.File(dir+'/lastdata/Seg/DB2_s' + str(j) + 'Seg.h5', 'r')
         '''step1: 数据集划分'''
         emg1, emg3, emg4, emg6 = file['emg1'][:], file['emg3'][:], file['emg4'][:], file['emg6'][:]
-        label1, label3, label4, label6 = file['y_train1'][:], file['y_train3'][:], file['y_train4'][:], file['y_train6'][:]
+        y1, y3, y4, y6 = file['y1'][:], file['y3'][:], file['y4'][:], file['y6'][:]
 
 
-        X_emg_train = np.concatenate([emg1, emg3, emg4, emg6], axis=0)
-        y_emg_train = np.concatenate([label1, label3, label4, label6], axis=0)
+        # x_emg_train = np.concatenate([emg1, emg3, emg4, emg6], axis=0)
+        # y_emg_train = np.concatenate([y1, y3, y4, y6], axis=0)
 
-        x_emg_test = file['emg_test'][:]
-        y_emg_test = file['y_test'][:]
+        emg_test = file['emg_test'][:]
+        y_test = file['y_test'][:]
 
         '''step2: 选择特征组合和归一化'''
         # 选择特征组合
         features = [nf.rms,nf.min,nf.max]
         # features = [nf.emg_dwpt, nf.iemg,nf.rms,nf.hist,nf.entropy,nf.kurtosis,nf.zero_cross,nf.min,nf.max,nf.mean,nf.median,nf.psd]
 
-        fea_train1 = nf.feature_extractor(features=features, shape=(emg1.shape[0], -1), data=emg1)
-        fea_train3 = nf.feature_extractor(features=features, shape=(emg3.shape[0], -1), data=emg3)
-        fea_train4 = nf.feature_extractor(features=features, shape=(emg4.shape[0], -1), data=emg4)
-        fea_train6 = nf.feature_extractor(features=features, shape=(emg6.shape[0], -1), data=emg6)
+        fea_x1 = nf.feature_extractor(features=features, shape=(emg1.shape[0], -1), data=emg1)
+        fea_x3 = nf.feature_extractor(features=features, shape=(emg3.shape[0], -1), data=emg3)
+        fea_x4 = nf.feature_extractor(features=features, shape=(emg4.shape[0], -1), data=emg4)
+        fea_x6 = nf.feature_extractor(features=features, shape=(emg6.shape[0], -1), data=emg6)
 
-        test_feature = nf.feature_extractor(features, (x_emg_test.shape[0], -1),  x_emg_test)
+        fea_test = nf.feature_extractor(features, (emg_test.shape[0], -1), emg_test)
 
         # ss = preprocessing.Normalizer(norm="l2")
         # ss.fit(train_feature)
@@ -54,16 +54,16 @@ if __name__ == '__main__':
 
         # 存储为h5文件
         file = h5py.File(dir+'/data/Fea/DB2_s' + str(j) + 'fea.h5', 'w')
-        file.create_dataset('fea_train1', data=fea_train1.astype('float32'))
-        file.create_dataset('fea_train3', data=fea_train3.astype('float32'))
-        file.create_dataset('fea_train4', data=fea_train4.astype('float32'))
-        file.create_dataset('fea_train6', data=fea_train6.astype('float32'))
-        file.create_dataset('fea_label1', data=label1.astype('int'))
-        file.create_dataset('fea_label3', data=label3.astype('int'))
-        file.create_dataset('fea_label4', data=label4.astype('int'))
-        file.create_dataset('fea_label6', data=label6.astype('int'))
+        file.create_dataset('fea_x1', data=fea_x1.astype('float32'))
+        file.create_dataset('fea_x3', data=fea_x3.astype('float32'))
+        file.create_dataset('fea_x4', data=fea_x4.astype('float32'))
+        file.create_dataset('fea_x6', data=fea_x6.astype('float32'))
+        file.create_dataset('fea_y1', data=y1.astype('int'))
+        file.create_dataset('fea_y3', data=y3.astype('int'))
+        file.create_dataset('fea_y4', data=y4.astype('int'))
+        file.create_dataset('fea_y6', data=y6.astype('int'))
 
-        file.create_dataset('fea_test', data=test_feature.astype('float32'))
-        file.create_dataset('fea_testLabel', data=y_emg_test.astype('int'))
+        file.create_dataset('fea_xtest', data=fea_test.astype('float32'))
+        file.create_dataset('fea_ytest', data=y_test.astype('int'))
         file.close()
         print('******************DB2_s' + str(j) + '分割完成***********************')

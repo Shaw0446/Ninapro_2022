@@ -1,14 +1,12 @@
-import os
 import tensorflow as tf
 import h5py
 import numpy as np
 import matplotlib.pyplot as plt
-from keras.callbacks import EarlyStopping, ModelCheckpoint
+from keras.callbacks import ModelCheckpoint
 from tfdeterminism import patch
 
 #确定随机数
 from Model1D.Away12CNN1D import DownAway12reluBNCNN1D
-from Models.PopularModel.DownAway3CBAM import DownAway3reluBNCBAM
 from Util.SepData import Sep12Data
 
 patch()

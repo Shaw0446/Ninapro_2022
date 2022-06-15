@@ -162,7 +162,7 @@ def model1():
     x1 = KL.Dense(256, activation='relu')(x1)
     X = KL.Dropout(0.2)(x1)
     X = KL.Flatten()(X)
-    s = KL.Dense(17, activation='softmax')(X)
+    s = KL.Dense(49, activation='softmax')(X)
     model = tf.keras.Model(inputs=input1, outputs=s)
     model.compile(optimizer=tf.keras.optimizers.Adam(lr=0.001),
                   loss='categorical_crossentropy', metrics=['accuracy'])

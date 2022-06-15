@@ -5,7 +5,7 @@ import nina_funcs as nf
 import matplotlib.pyplot as plt
 from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
 from tfdeterminism import patch
-dir='F:/DB2'
+root_data='F:/DB2'
 
 #确定随机数
 from Models.PopularModel.EnergyAndEmg import EnergyAndEmgCNN, EnergyAndEmgsoft
@@ -31,11 +31,11 @@ def pltCurve(loss, val_loss, accuracy, val_accuracy):
 
 if __name__ == '__main__':
     for j in range(1,2):
-        file_emg = h5py.File(dir+'/data/df_Seg/DB2_s' + str(j) + 'Seg.h5', 'r')
+        file_emg = h5py.File(root_data+'/data/df_Seg/DB2_s' + str(j) + 'Seg.h5', 'r')
         emg1, emg3, emg4, emg6 = file_emg['x_train1'][:], file_emg['x_train3'][:]\
             , file_emg['x_train4'][:], file_emg['x_train6'][:]
 
-        file = h5py.File(dir+'/data/energy_map/DB2_s' + str(j) + 'map.h5', 'r')
+        file = h5py.File(root_data+'/data/energy_map/DB2_s' + str(j) + 'map.h5', 'r')
         # 数据集划分呢
         map1, map3, map4, map6 = file['map1'][:], file['map3'][:], file['map4'][:], file['map6'][:]
         y_train1, y_train3, y_train4, y_train6 = file['y_train1'][:], file['y_train3'][:], file['y_train4'][:], file['y_train6'][:]

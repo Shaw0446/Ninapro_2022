@@ -4,8 +4,7 @@ from tensorflow.keras import regularizers
 from tensorflow.keras import backend as K
 from tensorflow.keras import layers as KL
 
-from Models.PopularModel.Away3CBAM import cbam_time
-from Models.PopularModel.Away3CBAM  import cbam_acquisition
+from Models.DBlayers.CBAM import cbam_time, cbam_acquisition
 
 channel_axis = 1 if K.image_data_format() == "channels_first" else 3
 

@@ -31,27 +31,18 @@ def plot_confusion_matrix(cm, savename, title='Confusion Matrix'):
     plt.savefig(savename, format='png')
     plt.show()
 
-
-# 多分类中每个类别的评价标准
-def multiclassEva(cm):
-    FP = cm.sum(axis=0) - np.diag(cm)
-    FN = cm.sum(axis=1) - np.diag(cm)
-    TP = np.diag(cm)
-    TN = cm.sum() - (FP + FN + TP)
-    # 返回各个类的TP,TN,FP,FN   得到的数组可以通过np.mean()求整体的均值
-    Pre = TP / (TP + FP)  # 查准率
-    Recall = TP / (TP + FN)  # 查全率
-    F1score = 2 * [(Pre * Recall) / (Pre + Recall)]
-
-    return Recall, Pre, F1score
-
-#整体分类的评价结果
-def OverallEva(Recall, Pre, F1score):
-    allRecall = np.mean(Recall)
-    allF1score = np.mean(F1score)
-    allPre = np.mean(Pre)
-    return allRecall,  allPre, allF1score
-
+def getACC(Y_test,Y_pred,n):
+    acc =[]
+    con_mat = confusion_matrix(Y_test,Y_pred)
+    for i in range(n):
+        number = np.sum(con_mat[:,:])
+        tp = con_mat[i][i]
+        fn = np.sum(con_mat[i,:])- tp
+        fp = np.sum(con_mat[:,i])- tp
+        tn = number - tp - fn - fp
+        acc1 =(tp+tn)/(number)
+        acc.append(acc1)
+    return acc
 
 
 if __name__ == '__main__':
@@ -61,17 +52,19 @@ if __name__ == '__main__':
         y_test = file['y_test'][:]
         file.close()
         # 选定手势做训练集，测试集，验证集
-        feaFile = h5py.File(dir + '/data/Fea/DB2_s' + str(j) + 'fea.h5', 'r')
-        fea_test = feaFile['fea_test'][:],
 
         model = keras.models.load_model(dir+'/DB2_model/DB2_s' + str(j) + 'model.h5')
+        '''特征向量数据适应'''
 
         Y_test = nf.get_categorical(np.array(y_test))
-        Y_predict = model.predict([X_test,fea_test])
+        Y_predict = model.predict(X_test)
 
         # # 返回每行中概率最大的元素的列坐标（热编码转为普通标签）
         y_pred = Y_predict.argmax(axis=1)
         y_true = Y_test.argmax(axis=1)
+        all_class=np.array(getACC(y_true, y_pred,49))
+        print("################################")
+        print(getACC(y_true, y_pred,49))
 
         cm = confusion_matrix(y_true, y_pred)
         # plot_confusion_matrix(cm,'1C-50E-2e4.png')

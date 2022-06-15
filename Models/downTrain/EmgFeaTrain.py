@@ -3,13 +3,8 @@ import h5py
 import numpy as np
 import nina_funcs as nf
 import matplotlib.pyplot as plt
-import os
-from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
-from Models.PopularModel.Away3CBAM import reluBNCBAMcat
-from Models.PopularModel.DownAway3CBAM import DownAway3reluBNCBAM
-from Models.PopularModel.EmgNet import EmgCNN, EmgCNN2, EmgAway3reluBConv
-from Models.PopularModel.FeaAndEmg import FeaAndEmg_model1
-from Util.SepData import Sep3Data
+from tensorflow.keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
+from Models.DBFeaEmgNet.FeaEmgFile import FeaAndEmg_model1
 from tfdeterminism import patch
 dir='F:/DB2'
 

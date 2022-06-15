@@ -149,7 +149,8 @@ for j in range(1, 2):
     # unList = uniform(actionList, 12)
     bnlist= bnEnhancesegment(actionList)
     emgList, labelList,repList= action_comb(bnlist, 400, 100)
-
+    # x_test = np.concatenate([emgList[2], emgList[5]], axis=0)
+    # y_test = np.concatenate([labelList[2], labelList[5]], axis=0)
 
     emg = np.concatenate([emgList[1], emgList[2], emgList[3], emgList[4], emgList[5], emgList[6]], axis=0)
     label = np.concatenate([labelList[1], labelList[2], labelList[3], labelList[4], labelList[5], labelList[6]], axis=0)
@@ -160,7 +161,8 @@ for j in range(1, 2):
     file.create_dataset('label', data=label.astype('int'))
     file.create_dataset('rep', data=rep.astype('int'))
 
-
+    # file.create_dataset('emg_test', data=x_test.astype('float32'))
+    # file.create_dataset('y_test', data=y_test.astype('int'))
     file.close()
     print('******************DB2_s' + str(j) + '分割完成***********************')
 
