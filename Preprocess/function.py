@@ -27,7 +27,6 @@ def get_set(emg, label, rep_arr, rep_vali):
     emg_train = emg[indices3, :]
     label_train = label[indices3]
 
-
     return emg_train, emg_vali, emg_test, label_train, label_vail, label_test
 
 

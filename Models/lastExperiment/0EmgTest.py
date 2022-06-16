@@ -6,6 +6,7 @@ import numpy as np
 from sklearn.metrics import confusion_matrix, f1_score, classification_report
 import matplotlib.pyplot as plt
 import nina_funcs as nf
+from Models.DBEmgNet.EmgNet import EmgAway3reluBConv
 
 dir='F:/DB2'
 
