@@ -8,5 +8,7 @@
 # aaa=scaler.transform(data)
 # print(scaleiimr.transform(data))
 # print()
-
-import seq2seq
+aa=set([2,2,2,2,2])
+print(aa)
+if(len(aa)==1):
+    print("dadasd")

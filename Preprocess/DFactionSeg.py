@@ -23,12 +23,20 @@ test_reps = [2, 5]
 def action_seg(data, channel, endlabel):
     actionList = []  # 存储动作
     begin = 0
+    count = 0  # 用于动作计数，纠正rep标签
     for aim in tqdm(range(1, len(data))):
         # 控制手势停止时间
         if (data.iloc[aim, channel] == endlabel + 1):
-            break;
+            break
         if (aim == len(data) - 1 or data.iloc[aim, channel] != data.iloc[aim - 1, channel]):
             end = aim
+            rep_num = set(data.iloc[begin:end, channel + 1])
+            count = count + 1
+            if (len(rep_num) != 1):
+                aaa =data.iloc[begin:end]
+                print("该动作stimulus标签有两中rep标签")
+                count = math.ceil((count % 12)/2)
+                data.loc[list(range(begin, end)), 'rerepetition'] = [count for _ in range(begin, end)]
             actionList.append(data[begin:end])
             begin = end
     return actionList
@@ -139,13 +147,13 @@ def action_comb(actionList, timeWindow, strideWindow, channel=12):
 
     return emgList, labelList, repList
 
-root_data='F:/DB2'
+root_data='F:/DB4'
 
-for j in range(1, 2):
-    df = pd.read_hdf(root_data+'/data/filter/DB2_s' + str(j) + 'filter.h5', 'df')
+for j in range(4, 5):
+    df = pd.read_hdf(root_data+'/data/restimulus/raw/DB4_s' + str(j) + 'raw.h5', 'df')
 
     '''滑动窗口分割'''
-    actionList = action_seg(df, 12, 49)
+    actionList = action_seg(df, 12, 11)
     # unList = uniform(actionList, 12)
     bnlist= bnEnhancesegment(actionList)
     emgList, labelList,repList= action_comb(bnlist, 400, 100)
@@ -155,12 +163,12 @@ for j in range(1, 2):
     label = np.concatenate([labelList[1], labelList[2], labelList[3], labelList[4], labelList[5], labelList[6]], axis=0)
     rep = np.concatenate([repList[1], repList[2], repList[3],repList[4], repList[5], repList[6]], axis=0)
     # # 存储为h5文件
-    file = h5py.File(root_data+'/data/Seg/DB2_s' + str(j) + 'Seg.h5', 'w')
+    file = h5py.File(root_data+'/data/restimulus/Seg/DB4_s' + str(j) + 'Seg.h5', 'w')
     file.create_dataset('emg', data=emg.astype('float32'))
     file.create_dataset('label', data=label.astype('int'))
     file.create_dataset('rep', data=rep.astype('int'))
 
 
     file.close()
-    print('******************DB2_s' + str(j) + '分割完成***********************')
+    print('******************DB4_s' + str(j) + '分割完成***********************')
 
