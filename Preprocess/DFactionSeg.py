@@ -30,18 +30,20 @@ def action_seg(data, channel, endlabel):
             break
         if (aim == len(data) - 1 or data.iloc[aim, channel] != data.iloc[aim - 1, channel]):
             end = aim
-            rep_num = set(data.iloc[begin:end, channel + 1])
-            count = count + 1
-            if (len(rep_num) != 1):
-                aaa =data.iloc[begin:end]
-                print("该动作stimulus标签有两中rep标签")
-                count = math.ceil((count % 12)/2)
-                data.loc[list(range(begin, end)), 'rerepetition'] = [count for _ in range(begin, end)]
+            # rep_num = set(data.iloc[begin:end, channel + 1])
+            # if (data.iloc[begin, channel + 1] != math.floor((count % 12) / 2) + 1 or len(rep_num) != 1):
+            #     aaa =data.iloc[begin:end]
+            #     print("该动作rep标签标记错误")
+            #     count1 = math.floor((count % 12) / 2)+1
+            #     data.loc[list(range(begin, end)), 'rerepetition'] = [count1 for _ in range(begin, end)]
+            # count = count + 1
             actionList.append(data[begin:end])
             begin = end
     return actionList
 
 '''数据标准化（list的元素为df的方式）'''
+
+
 def uniform(actionList, channel):
     for action in actionList:
         iemg = action.iloc[:, :channel].copy()
@@ -57,11 +59,12 @@ def uniform(actionList, channel):
     该函数在输入二维数组时会将各个通道随机打乱，破坏了不同电极采样的同步性，故设定随机种子，单个通道依次打乱
         输入的数据是一维列向量，新生成的数据是一维行向量
 '''
-def OneEnhanceEMG(data):
-    newdata =tsaug.TimeWarp(n_speed_change=1, max_speed_ratio=1.5, seed=123).augment(data)
-#     enhancedata =np.hstack((data, newdata))
-    return data, newdata
 
+
+def OneEnhanceEMG(data):
+    newdata = tsaug.TimeWarp(n_speed_change=1, max_speed_ratio=1.5, seed=123).augment(data)
+    #     enhancedata =np.hstack((data, newdata))
+    return data, newdata
 
 
 '''
@@ -69,16 +72,18 @@ def OneEnhanceEMG(data):
     不分割为肌电子图返回数据标准化后结果,BNdatalist元素为单独一个动作手势标准化后的结果，
     保存有对应的标签 ,返回类型(time,channel),考虑到实验流程，把数据增强放在标准化前
 '''
+
+
 def bnEnhancesegment(seglist, channel=12):
     channel = 12
     BNdatalist = []
     for i in range(len(seglist)):
         temp_label = seglist[i].iloc[0, channel]
-        temp_rep = seglist[i].iloc[0, channel+1]
-        #跳过标签为0
-        if(temp_label==0):
-           continue
-        if temp_rep in([1, 3, 4, 6]):
+        temp_rep = seglist[i].iloc[0, channel + 1]
+        # 跳过标签为0
+        if (temp_label == 0):
+            continue
+        if temp_rep in ([1, 3, 4, 6]):
             # 增强前后的手势分开标准化，对训练集第1，3，4，6次进行增强
             timedata = np.array(seglist[i].iloc[:, :channel].copy())
             data = []
@@ -87,7 +92,7 @@ def bnEnhancesegment(seglist, channel=12):
                 datasample, newdatasample = OneEnhanceEMG(timedata[:, Numchannel])
                 data.append(datasample)
                 newdata.append(newdatasample)
-            data = (np.array(data)).T       #将数据转换为（time,channel）
+            data = (np.array(data)).T  # 将数据转换为（time,channel）
             newdata = (np.array(newdata)).T
             # flag来控制对未增强数据的保存
             flag = True
@@ -96,40 +101,39 @@ def bnEnhancesegment(seglist, channel=12):
                 Zscdata = scaler.fit_transform(iemg[:])
                 BNdata = Zscdata
                 if (flag):
-                    bndata1 =BNdata
-                    flag=False
+                    bndata1 = BNdata
+                    flag = False
                 else:
-                    bndata2 =BNdata
-            #数据倍增后，标签倍增
+                    bndata2 = BNdata
+            # 数据倍增后，标签倍增
             BNdata = np.vstack((bndata1, bndata2))
             BNlabel = np.hstack([seglist[i].iloc[:, channel], seglist[i].iloc[:, channel]])
-            BNrep = np.hstack([seglist[i].iloc[:, channel+1], seglist[i].iloc[:, channel+1]])
-        #测试集不做数据增强
+            BNrep = np.hstack([seglist[i].iloc[:, channel + 1], seglist[i].iloc[:, channel + 1]])
+        # 测试集不做数据增强
         else:
             iemg = np.array(seglist[i].iloc[:, :channel].copy())
             scaler = StandardScaler()
             Zscdata = scaler.fit_transform(iemg[:])
             BNdata = Zscdata
-            BNlabel= np.array(seglist[i].iloc[:, channel])
-            BNrep = np.array(seglist[i].iloc[:, channel+1])
-        myemg=pd.DataFrame(BNdata)
+            BNlabel = np.array(seglist[i].iloc[:, channel])
+            BNrep = np.array(seglist[i].iloc[:, channel + 1])
+        myemg = pd.DataFrame(BNdata)
         myemg['stimulus'] = BNlabel
         myemg['repetition'] = BNrep
         BNdatalist.append(myemg)
     return BNdatalist
 
 
-
-
-
 '''时间增量窗口分割和划分数据集，输入参数为存储动作的list'''
+
+
 def action_comb(actionList, timeWindow, strideWindow, channel=12):
     emgList = [[], [], [], [], [], [], []]
     labelList = [[], [], [], [], [], [], []]
-    repList =[[], [], [], [], [], [], []]
+    repList = [[], [], [], [], [], [], []]
     for action in actionList:
         rep = int(action.values[0, channel + 1])
-        if rep == 0:        #暂时不考虑休息状态
+        if rep == 0:  # 暂时不考虑休息状态
             continue
         length = math.floor((len(action) - timeWindow) / strideWindow) + 1
         for j in range(length):
@@ -147,28 +151,26 @@ def action_comb(actionList, timeWindow, strideWindow, channel=12):
 
     return emgList, labelList, repList
 
-root_data='F:/DB4'
+
+root_data = 'F:/DB4'
 
 for j in range(4, 5):
-    df = pd.read_hdf(root_data+'/data/restimulus/raw/DB4_s' + str(j) + 'raw.h5', 'df')
+    df = pd.read_hdf(root_data + '/data/restimulus/raw/DB4_s' + str(j) + 'raw.h5', 'df')
 
     '''滑动窗口分割'''
     actionList = action_seg(df, 12, 11)
     # unList = uniform(actionList, 12)
-    bnlist= bnEnhancesegment(actionList)
-    emgList, labelList,repList= action_comb(bnlist, 400, 100)
-
+    bnlist = bnEnhancesegment(actionList)
+    emgList, labelList, repList = action_comb(bnlist, 400, 100)
 
     emg = np.concatenate([emgList[1], emgList[2], emgList[3], emgList[4], emgList[5], emgList[6]], axis=0)
     label = np.concatenate([labelList[1], labelList[2], labelList[3], labelList[4], labelList[5], labelList[6]], axis=0)
-    rep = np.concatenate([repList[1], repList[2], repList[3],repList[4], repList[5], repList[6]], axis=0)
+    rep = np.concatenate([repList[1], repList[2], repList[3], repList[4], repList[5], repList[6]], axis=0)
     # # 存储为h5文件
-    file = h5py.File(root_data+'/data/restimulus/Seg/DB4_s' + str(j) + 'Seg.h5', 'w')
+    file = h5py.File(root_data + '/data/restimulus/Seg/DB4_s' + str(j) + 'Seg.h5', 'w')
     file.create_dataset('emg', data=emg.astype('float32'))
     file.create_dataset('label', data=label.astype('int'))
     file.create_dataset('rep', data=rep.astype('int'))
 
-
     file.close()
     print('******************DB4_s' + str(j) + '分割完成***********************')
-
