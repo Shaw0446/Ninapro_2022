@@ -7,6 +7,8 @@ from sklearn.metrics import confusion_matrix, f1_score, classification_report
 import matplotlib.pyplot as plt
 import nina_funcs as nf
 
+from Util.function import get_threeSet
+
 dir='F:/DB2'
 
 
@@ -44,23 +46,27 @@ def getACC(Y_test,Y_pred,n):
         acc.append(acc1)
     return acc
 
-
+root_data = 'F:/DB2'
 if __name__ == '__main__':
     for j in range(1, 2):
-        file = h5py.File(dir+'/lastdata/Seg/DB2_s' + str(j) + 'Seg.h5', 'r')
-        X_test = file['emg_test'][:]
-        y_test = file['y_test'][:]
+        file = h5py.File(root_data + '/data/stimulus/Seg/DB2_s' + str(j) + 'Seg.h5', 'r')
+        emg, label, rep = file['emg'][:], file['label'][:], file['rep'][:]
+        emg_train, emg_vali, emg_test, label_train, label_vail, label_test = get_threeSet(emg, label, rep, 6)
         file.close()
-        # 选定手势做训练集，测试集，验证集
-        feaFile = h5py.File(dir + '/data/Fea/DB2_s' + str(j) + 'fea.h5', 'r')
-        fea_xtest = feaFile['fea_xtest'][:]
+        label_train, label_vail = nf.get_categorical(label_train), nf.get_categorical(label_vail)
+
+        feaFile = h5py.File(root_data + '/data/stimulus/Fea/DB2_s' + str(j) + 'fea.h5', 'r')
+        # 将六次重复手势分开存储
+        fea_all, fea_label, fea_rep = feaFile['fea_all'][:], feaFile['fea_label'][:], feaFile['fea_rep'][:]
+        feaFile.close()
+        fea_train, fea_vali, fea_test, feay_train, feay_vail, feay_test = get_threeSet(fea_all, fea_label, fea_rep, 6)
 
         model = keras.models.load_model(dir+'/DB2_model/DB2_s' + str(j) + 'model.h5')
         '''特征向量数据适应'''
-        fea_xtest = np.expand_dims(fea_xtest, axis=-1)
+        fea_xtest = np.expand_dims(fea_test, axis=-1)
 
-        Y_test = nf.get_categorical(np.array(y_test))
-        Y_predict = model.predict([X_test,fea_xtest])
+        Y_test = nf.get_categorical(np.array(label_test))
+        Y_predict = model.predict([emg_test,fea_xtest])
 
         # # 返回每行中概率最大的元素的列坐标（热编码转为普通标签）
         y_pred = Y_predict.argmax(axis=1)
@@ -76,7 +82,7 @@ if __name__ == '__main__':
             classes.append(str(i))
         contexts = classification_report(y_true, y_pred, target_names=classes, digits=4)
 
-        with open("F:/DB2/result/111/DB2_s"+str(j)+"6seg.txt", "w", encoding='utf-8') as f:
+        with open("F:/DB2/result/stimulus/111/DB2_s"+str(j)+"6seg.txt", "w", encoding='utf-8') as f:
             f.write(str(contexts))
             f.close()
         # print(classification_report(y_true, y_pred, target_names=classes, digits=4))

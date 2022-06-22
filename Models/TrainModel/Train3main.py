@@ -9,6 +9,9 @@ from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLRO
 from Models.DBEmgNet.CBAMFile import Away3reluBNCBAMcat
 from Util.SepData import Sep3Data
 from tfdeterminism import patch
+
+from Util.function import get_set
+
 root_data='F:/DB2'
 
 #确定随机数
@@ -36,15 +39,18 @@ if __name__ == '__main__':
     for j in range(1, 2):
         file = h5py.File(root_data + '/data/Seg/DB2_s' + str(j) + 'Seg.h5', 'r')
         # 数据集划分呢
-        X_train, y_train, r_train = file['x_train'][:], file['y_train'][:], file['r_train'][:]
-        X_test, y_test, r_test = file['x_test'][:], file['y_test'][:], file['r_test'][:]
+        file = h5py.File(root_data + '/data/stimulus/Seg/DB2_s' + str(j) + 'Seg11.h5', 'r')
+        emg, label, rep = file['emg'][:], file['label'][:], file['rep'][:]
+        emg_train, emg_vali, emg_test, label_train, label_vail, label_test = get_set(emg, label, rep, 6)
         file.close()
 
-        Xtrain1, Xtrain2, Xtrain3 = Sep3Data(X_train)
-        Xvali1, Xvali2, Xvali3 = Sep3Data(X_test)
+        emg_train, emg_vali, emg_test, label_train, label_vail, label_test = get_set(emg, label, rep, 4)
 
-        Y_train = nf.get_categorical(y_train)
-        Y_vali= nf.get_categorical(y_test)
+        Xtrain1, Xtrain2, Xtrain3 = Sep3Data(emg_train)
+        Xvali1, Xvali2, Xvali3 = Sep3Data(emg_vali)
+
+        Y_train = nf.get_categorical(label_train)
+        Y_vali= nf.get_categorical(label_test)
 
         callbacks = [#1设置学习率衰减,2保存最优模型
             # ReduceLROnPlateau(monitor='val_accuracy', factor=0.1, patience=10, verbose=0, mode='auto', min_delta=0.0001,

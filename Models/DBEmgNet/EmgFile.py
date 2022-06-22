@@ -136,14 +136,14 @@ def BConv():
     input1 = KL.Input(shape=(400, 12))
     input11 = tf.expand_dims(input=input1, axis=3)
 
-    x1 = KL.Conv2D(filters=64, kernel_size=(3, 1), strides=(1, 1), activation='relu', padding='same')(input11)
+    x1 = KL.Conv2D(filters=64, kernel_size=(8, 1), strides=(1, 1), activation='relu', padding='same')(input11)
     x1 = KL.BatchNormalization()(x1)
-    x1 = KL.Conv2D(filters=128, kernel_size=(1, 2), strides=(1, 1), activation='relu', padding='same')(x1)
+    x1 = KL.Conv2D(filters=128, kernel_size=(1, 12), strides=(1, 1), activation='relu', padding='same')(x1)
     x1 = KL.BatchNormalization()(x1)
     output1 = x1
     X = KL.GlobalAvgPool2D()(output1)
     X = KL.Dense(128, activation='relu')(X)
-    X = KL.Dropout(0.2)(X)
+    X = KL.Dropout(0.1)(X)
     s = KL.Dense(49, activation='softmax')(X)
     model = tf.keras.Model(inputs=input1, outputs=s)
     model.compile(optimizer=tf.keras.optimizers.Adam(lr=0.001),

@@ -1,9 +1,46 @@
-from sklearn.model_selection import KFold
+import math
+import h5py
+import pandas as pd
+import numpy as np
 
 
-def shuffle_set(emg1, emg3, emg4, emg6, y1, y3, y4, y6):
-    train_list = [emg1, emg3, emg4, emg6]
-    for train_index, test_index in train_list:
-        print("test index: ", test_index)
-        x_train, x_test = x.iloc[train_index], x.iloc[test_index]
-        y_train, y_test = y.iloc[train_index], y.iloc[test_index]
+
+def get_threeSet(emg, label, rep_arr, rep_vali):
+    train_reps = [1, 3, 4, 6]
+    test_reps = [2, 5]
+    train_reps.remove(rep_vali)
+    x = [np.where(rep_arr[:] == rep) for rep in test_reps]
+    indices = np.squeeze(np.concatenate(x, axis=-1))
+    emg_test = emg[indices, :]
+    label_test = label[indices]
+    x = [np.where(rep_arr[:] == rep_vali)]
+    indices2 = np.squeeze(np.concatenate(x, axis=-1))
+    emg_vali = emg[indices2, :]
+    label_vail = label[indices2]
+    x = [np.where(rep_arr[:] == rep) for rep in train_reps]
+    indices3 = np.squeeze(np.concatenate(x, axis=-1))
+    emg_train = emg[indices3, :]
+    label_train = label[indices3]
+
+    return emg_train, emg_vali, emg_test, label_train, label_vail, label_test
+
+
+def get_twoSet(emg, label, rep_arr):
+    train_reps = [1, 3, 4, 6]
+    test_reps = [2, 5]
+    x = [np.where(rep_arr[:] == rep) for rep in test_reps]
+    indices = np.squeeze(np.concatenate(x, axis=-1))
+    emg_test = emg[indices, :]
+    label_test = label[indices]
+    x = [np.where(rep_arr[:] == rep) for rep in train_reps]
+    indices3 = np.squeeze(np.concatenate(x, axis=-1))
+    emg_train = emg[indices3, :]
+    label_train = label[indices3]
+
+    return emg_train, emg_test, label_train, label_test
+
+# if __name__ == '__main__':
+#     train_reps = [1, 3, 4, 6]
+#     test_reps = 3
+#     train_reps.remove(test_reps)
+#     train_reps

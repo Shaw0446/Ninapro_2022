@@ -34,7 +34,7 @@ if __name__ == '__main__':
         emg1, emg3, emg4, emg6 = file['emg1'][:], file['emg3'][:], file['emg4'][:], file['emg6'][:]
         y1, y3, y4, y6 = file['y1'][:], file['y3'][:], file['y4'][:], file['y6'][:]
         X_train = np.concatenate([emg1, emg3, emg4, ], axis=0)
-        y_train = np.concatenate([y1, y3, y4,  ], axis=0)
+        y_train = np.concatenate([y1, y3, y4,], axis=0)
         Y_train = nf.get_categorical(y_train)
         # X_test = file['emg_test'][:]
         # y_vali = file['y_test'][:]

@@ -7,6 +7,7 @@ import nina_funcs as nf
 from sklearn import preprocessing
 import scikitplot as skplt
 from sklearn.feature_selection import SelectKBest
+from Util.function import get_threeSet
 
 train_reps = [1, 3, 4, 6]
 test_reps = [2, 5]
@@ -49,24 +50,25 @@ def plot_feature_scores(x, y, names=None, chname=None):
     plt.show()
 
 
+root_data = 'F:/DB2'
 
-for j in range(1, 2):
-    file = h5py.File(dir + '/lastdata/Seg/DB2_s' + str(j) + 'Seg.h5', 'r')
-    emg1, emg3, emg4, emg6 = file['emg1'][:], file['emg3'][:], file['emg4'][:], file['emg6'][:]
-    y1, y3, y4, y6 = file['y1'][:], file['y3'][:], file['y4'][:], file['y6'][:]
+if __name__ == '__main__':
+    for j in range(1, 2):
+        file = h5py.File(root_data + '/data/stimulus/Seg/DB2_s' + str(j) + 'Seg.h5', 'r')
+        emg, label, rep = file['emg'][:], file['label'][:], file['rep'][:]
+        file.close()
 
-    x_train = np.concatenate([emg1, emg3, emg4, emg6 ], axis=0)
-    y_train = np.concatenate([y1, y3, y4, y6], axis=0)
+        emg_train,  emg_test, label_train,  label_test = get_threeSet(emg, label, rep)
 
-    '''step2: 选择特征组合和归一化'''
-    # 选择特征组合
-    # features = [nf.iemg]
-    ch = 4
-    features = [nf.iemg, nf.rms, nf.entropy, nf.kurtosis, nf.zero_cross, nf.min, nf.max, nf.mean, nf.median]
-    temp = x_train[:, :, ch - 1]
-    temp = temp.reshape(temp.shape[0], temp.shape[1], -1)
-    train_feature = nf.feature_extractor(features=features, shape=(temp.shape[0], -1), data=temp)
-    # test_feature = nf.feature_extractor(features, (x_test.shape[0], -1), x_test)
-    fea_name = ['iemg', 'rms', 'entropy', 'kurtosis', 'zero_cross', 'min', 'max', 'mean', 'median']
-    # fea_name = [ 'rms', 'iemg', 'min','max']
-    plot_feature_scores(np.array(train_feature), y_train, names=fea_name, chname='ch' + str(ch))
+        '''step2: 选择特征组合和归一化'''
+        # 选择特征组合
+        # features = [nf.iemg]
+        ch = 4
+        features = [nf.iemg, nf.rms, nf.entropy, nf.kurtosis, nf.zero_cross, nf.min, nf.max, nf.mean, nf.median]
+        temp = emg_train[:, :, ch - 1]
+        temp = temp.reshape(temp.shape[0], temp.shape[1], -1)
+        train_feature = nf.feature_extractor(features=features, shape=(temp.shape[0], -1), data=temp)
+        # test_feature = nf.feature_extractor(features, (x_test.shape[0], -1), x_test)
+        fea_name = ['iemg', 'rms', 'entropy', 'kurtosis', 'zero_cross', 'min', 'max', 'mean', 'median']
+        # fea_name = [ 'rms', 'iemg', 'min','max']
+        plot_feature_scores(np.array(train_feature),  label_train, names=fea_name, chname='ch' + str(ch))

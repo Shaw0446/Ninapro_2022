@@ -19,19 +19,27 @@ test_reps = [2, 5]
 '''
 
 '''  df形式的动作分割（要求能不排除休息状态）'''
-
 def action_seg(data, channel, endlabel):
     actionList = []  # 存储动作
     begin = 0
+    count = 0  # 用于动作计数，纠正rep标签
     for aim in tqdm(range(1, len(data))):
         # 控制手势停止时间
         if (data.iloc[aim, channel] == endlabel + 1):
-            break;
+            break
         if (aim == len(data) - 1 or data.iloc[aim, channel] != data.iloc[aim - 1, channel]):
             end = aim
+            rep_num = set(data.iloc[begin:end, channel + 1])
+            if (data.iloc[begin, channel + 1] != math.floor((count % 12) / 2) + 1 or len(rep_num) != 1):
+                aaa =data.iloc[begin:end]
+                print("该动作rep标签标记错误")
+                count1 = math.floor((count % 12) / 2)+1
+                data.loc[list(range(begin, end)), 'rerepetition'] = [count1 for _ in range(begin, end)]
+            count = count + 1
             actionList.append(data[begin:end])
             begin = end
     return actionList
+
 
 '''数据标准化（list的元素为df的方式）'''
 def uniform(actionList, channel):

@@ -15,7 +15,7 @@ def FeaAndEmg_model1():
     x1 = KL.Conv2D(filters=64, kernel_size=(8, 1), strides=(1, 1), activation='relu', padding='same')(input11)
     x1 = KL.BatchNormalization()(x1)
     # x1 = cbam_time(x1)
-    x1 = KL.Conv2D(filters=128, kernel_size=(1, 8), strides=(1, 1), activation='relu', padding='same')(x1)
+    x1 = KL.Conv2D(filters=128, kernel_size=(1, 12), strides=(1, 1), activation='relu', padding='same')(x1)
     x1 = KL.BatchNormalization()(x1)
     # x1 = cbam_acquisition(x1)
     x1 = KL.GlobalAvgPool2D()(x1)
@@ -30,7 +30,7 @@ def FeaAndEmg_model1():
 
 
     X = KL.Concatenate(axis=-1)([x1,x2])
-    X = KL.Dense(256, activation='relu')(X)
+    X = KL.Dense(128, activation='relu')(X)
     X = KL.Dropout(0.2)(X)
     s = KL.Dense(49, activation='softmax')(X)
     model = tf.keras.Model(inputs=[input1,input2], outputs=s)
