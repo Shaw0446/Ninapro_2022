@@ -31,10 +31,11 @@ if __name__ == '__main__':
 
         '''step2: 选择特征组合和归一化'''
         # 选择特征组合
-        features = [nf.rms,nf.min,nf.max]
-        # features = [nf.emg_dwpt, nf.iemg,nf.rms,nf.hist,nf.entropy,nf.kurtosis,nf.zero_cross,nf.min,nf.max,nf.mean,nf.median,nf.psd]
+        features = [nf.psd]
+        # features = [nf.emg_dwpt, nf.iemg,nf.rms,nf.hist,nf.entropy,nf.kurtosis,nf.zero_cross,nf.min,nf.max,nf.mean,nf.median,nf.wl]
 
-        fea_all = nf.feature_extractor(features=features, shape=(emg.shape[0], -1), data=emg)
+        fea_all = nf.frequency_features_extractor(features=features, shape=(emg.shape[0], -1), data=emg)
+        # fea_all = nf.feature_extractor(features=features, shape=(emg.shape[0], -1), data=emg)
 
         # ss = preprocessing.Normalizer(norm="l2")
         # ss.fit(train_feature)

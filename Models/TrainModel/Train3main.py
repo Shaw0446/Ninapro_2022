@@ -10,7 +10,6 @@ from Models.DBEmgNet.CBAMFile import Away3reluBNCBAMcat
 from Util.SepData import Sep3Data
 from tfdeterminism import patch
 
-from Util.function import get_set
 
 root_data='F:/DB2'
 

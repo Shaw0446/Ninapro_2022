@@ -13,10 +13,3 @@ from collections import Counter
 # if(len(aa)==1):
 #     print("dadasd")
 
-n=[1,2,3,6,1,2,3]
-n.append(1)
-n.remove(1)
-filter
-print(n)
-# print(n.count(2))
-
